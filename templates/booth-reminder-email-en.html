@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>Your Momoto booth is still waiting</title>
+    <!--
+      English version. booth-reminder-email-id.html is the Indonesian one — change both
+      if you change either, and keep the .txt pair in step too.
+
+      Mail-merge fields:
+        {{DISPLAY_NAME}}  the account's display name, e.g. "Nurul"
+        {{BOOTH_URL}}     finished link to the booth, built by the caller
+
+      Sent by `npm run send:reminders` in momoto-be to accounts that have never made a
+      strip. It carries no password and no token, so a forwarded copy gives nothing
+      away — keep it that way if you edit it.
+
+      Built for email, not the web: table layout, inline styles, no external CSS or
+      webfonts, 600px wide. The <style> block below is progressive enhancement only —
+      every rule that matters is also inlined, because Gmail strips <style> in some
+      contexts and Outlook ignores much of it.
+    -->
+    <style>
+      @media only screen and (max-width: 620px) {
+        .container { width: 100% !important; }
+        .px { padding-left: 24px !important; padding-right: 24px !important; }
+        .h1 { font-size: 24px !important; line-height: 32px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f5f4f7; -webkit-font-smoothing:antialiased;">
+    <!-- Preheader: the grey preview line next to the subject. Hidden in the body. -->
+    <div style="display:none; font-size:1px; color:#f5f4f7; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      You haven't taken a strip yet — it takes about two minutes, on your own or together.
+    </div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f5f4f7;">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+
+          <table role="presentation" class="container" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow:0 2px 8px rgba(15,23,42,0.06);">
+
+            <!-- Brand bar -->
+            <tr>
+              <td align="center" style="background:linear-gradient(160deg,#ffe3ec 0%,#fcf7f0 55%,#d9ffea 100%); background-color:#ffe3ec; padding:32px 24px 28px 24px;">
+                <img src="https://momotoldr.com/logo-momoto.png" width="56" height="52" alt="Momoto" style="display:block; border:0; width:56px; height:auto; margin:0 auto 12px auto;" />
+                <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#8a5a68;">
+                  Your booth is ready
+                </div>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td class="px" style="padding:36px 44px 8px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <h1 class="h1" style="margin:0 0 16px 0; font-size:28px; line-height:36px; font-weight:700; color:#0f172a;">
+                  Still waiting on your first strip, {{DISPLAY_NAME}} 📸
+                </h1>
+                <p style="margin:0 0 16px 0; font-size:15px; line-height:24px; color:#475569;">
+                  Your Momoto account is set up and the booth is open — but you haven't taken
+                  a photo strip yet. No rush from us, we'd just hate for you to miss it.
+                </p>
+                <p style="margin:0 0 8px 0; font-size:15px; line-height:24px; color:#475569;">
+                  The whole thing takes about <strong style="color:#334155;">two minutes</strong>:
+                  four shots, a countdown before each one, and a strip you can keep at the end.
+                </p>
+              </td>
+            </tr>
+
+            <!-- The one thing people wait for that they don't need to -->
+            <tr>
+              <td class="px" style="padding:20px 44px 8px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;">
+                  <tr>
+                    <td style="padding:22px 24px;">
+                      <div style="font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#64748b; padding-bottom:10px;">
+                        You don't have to wait for anyone
+                      </div>
+                      <div style="font-size:14px; line-height:22px; color:#475569;">
+                        A <strong style="color:#334155;">solo</strong> session works exactly like a
+                        date one — same booth, same templates, same strip at the end. Try it on your
+                        own now, and shoot together when you're both free.
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td class="px" align="center" style="padding:28px 44px 8px 44px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="background-color:#0f172a; border-radius:10px;">
+                      <a href="{{BOOTH_URL}}" style="display:inline-block; padding:14px 34px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none;">
+                        Open the photobooth
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:12px 0 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; color:#94a3b8;">
+                  Sign in with the username from your invite — not an email address.
+                </p>
+              </td>
+            </tr>
+
+            <!-- How it goes -->
+            <tr>
+              <td class="px" style="padding:28px 44px 0 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <div style="border-top:1px solid #e2e8f0; padding-top:26px;">
+                  <h2 style="margin:0 0 14px 0; font-size:17px; line-height:24px; font-weight:700; color:#0f172a;">
+                    How it goes
+                  </h2>
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">1.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569; padding-bottom:10px;">
+                        Open the booth and pick a <strong style="color:#334155;">solo</strong> or
+                        <strong style="color:#334155;">date</strong> session.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">2.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569; padding-bottom:10px;">
+                        Choose a template, then let the camera count you in — four shots, and you
+                        can retake any of them.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">3.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569;">
+                        Your strip lands in your cart, ready to keep.
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin:14px 0 0 0; font-size:13px; line-height:20px; color:#94a3b8;">
+                    For a date session, tap the room code to copy it and send it to your partner —
+                    they enter that code and you're both in the same booth.
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Feedback ask -->
+            <tr>
+              <td class="px" style="padding:26px 44px 36px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f0fdf7; border-radius:14px;">
+                  <tr>
+                    <td style="padding:18px 22px; font-size:14px; line-height:22px; color:#3f6b58;">
+                      Already tried it and have something in mind — the camera, the sign-in, the
+                      wait, anything that annoyed you? Please tell us in the survey:
+                      <a href="https://bit.ly/SurveyTemanMomo" style="color:#2f6b52; font-weight:700;">bit.ly/SurveyTemanMomo</a>.
+                      It's the most useful thing you could send us.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="px" style="padding:22px 44px 30px 44px; background-color:#fafafa; border-top:1px solid #eef2f6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <p style="margin:0 0 6px 0; font-size:13px; font-weight:700; color:#334155;">Momoto</p>
+                <p style="margin:0 0 12px 0; font-size:12px; line-height:18px; color:#94a3b8;">
+                  Snap, strip, share.
+                </p>
+                <p style="margin:0; font-size:11px; line-height:18px; color:#a3aab5;">
+                  You're getting this because you signed up to try Momoto early.
+                  <br />
+                  <a href="https://momotoldr.com/terms" style="color:#94a3b8;">Terms</a> &middot;
+                  <a href="https://momotoldr.com/privacy" style="color:#94a3b8;">Privacy</a>
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,41 @@
+Subjek: Booth Momoto kamu masih menunggu
+
+Halo {{DISPLAY_NAME}},
+
+Akun Momoto kamu sudah siap dan booth-nya sudah terbuka — tapi kamu belum pernah
+membuat strip foto. Santai saja, kami cuma nggak mau kamu melewatkannya.
+
+Semuanya cuma butuh sekitar dua menit: empat jepretan, ada hitungan mundur
+sebelum tiap foto, dan sebuah strip yang bisa kamu simpan di akhir.
+
+KAMU NGGAK PERLU MENUNGGU SIAPA PUN
+  Sesi solo jalannya persis seperti sesi kencan — booth yang sama, template yang
+  sama, strip yang sama di akhir. Coba sendiri dulu sekarang, lalu berfoto
+  bareng saat kalian berdua sempat.
+
+BUKA PHOTOBOOTH
+  {{BOOTH_URL}}
+
+  Masuk pakai nama pengguna dari email undangan kamu, bukan alamat email.
+
+ALURNYA
+  1. Buka booth dan pilih sesi "solo" atau "kencan".
+  2. Pilih template, lalu biarkan kamera menghitung mundur — empat jepretan, dan
+     kamu bisa mengulang salah satunya.
+  3. Strip kamu langsung masuk ke keranjang, siap disimpan.
+
+Untuk sesi kencan, ketuk kode ruang untuk menyalinnya lalu kirim ke pasangan
+kamu — dia masukkan kode itu, dan kalian berdua ada di booth yang sama.
+
+Sudah pernah coba dan ada yang mengganjal — kameranya, cara masuknya,
+menunggunya, apa pun yang bikin kesal? Ceritakan lewat formulir survei. Itu
+masukan paling berguna buat kami.
+
+  bit.ly/SurveyTemanMomo
+
+— Momoto
+Jepret, susun, bagikan.
+
+Kamu menerima ini karena bersedia mencoba Momoto lebih dulu.
+Syarat & Ketentuan: https://momotoldr.com/terms
+Kebijakan Privasi: https://momotoldr.com/privacy

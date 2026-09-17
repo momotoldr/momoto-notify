@@ -1,0 +1,58 @@
+Subjek: Kamu ikut beta tertutup Momoto
+
+Halo {{DISPLAY_NAME}},
+
+Momoto adalah studio kecil berisi pengalaman kencan yang menyenangkan untuk
+hubungan jarak jauh — dimulai dari photobooth yang bisa kamu dan pasangan pakai
+bareng, langsung, dari dua tempat berbeda.
+
+Kami sedang menguji bersama sekelompok kecil orang sebelum dibuka untuk semua,
+dan kami ingin sekali dengar pendapat jujur kamu.
+
+DETAIL MASUK KAMU
+  Masuk di:      https://momotoldr.com/login
+  Nama pengguna: {{USERNAME}}
+  Kata sandi:    {{PASSWORD}}
+
+{{#PARTNER}}
+DETAIL MASUK UNTUK PASANGAN KAMU
+  Nama pengguna: {{PARTNER_USERNAME}}
+  Kata sandi:    {{PARTNER_PASSWORD}}
+
+  Akun kedua ini untuk pasangan kamu — kirimkan detail di atas ke dia. Setelah
+  masuk, dia bisa mengganti nama tampilan dan kata sandinya sendiri lewat Profil.
+
+{{/PARTNER}}
+Masuk pakai nama pengguna di atas, bukan alamat email.
+
+SETELAH KAMU MASUK
+  Buka Profil untuk mengganti kata sandi ini dengan yang lebih mudah kamu ingat,
+  dan untuk mengonfirmasi alamat emailmu. Konfirmasi itulah yang membuat kamu
+  bisa mengatur ulang kata sandi sendiri nanti — sebelum itu, kamu harus minta
+  bantuan kami.
+
+JEPRET BARENG PASANGAN
+{{#PARTNER}}
+  Pastikan pasangan kamu sudah masuk pakai akun keduanya lebih dulu.
+
+{{/PARTNER}}
+  1. Buka photobooth, lalu mulai sesi "date".
+  2. Ketuk kode ruang untuk menyalinnya, lalu kirim ke pasangan kamu.
+  3. Dia memasukkan kode itu untuk bergabung, dan kalian berdua ada di booth
+     yang sama.
+
+Satu kode berlaku untuk satu sesi — buat ruang baru, kodenya juga baru. Ada juga
+tautan pasangan di menu Profil; itu opsional, dan kamu tidak perlu itu untuk
+berfoto bareng.
+
+Apa pun yang terasa lambat, rusak, atau bikin kesal — tolong beri tahu kami. Ada
+tombol masukan di pojok setiap halaman, dan membalas email ini juga bisa.
+
+— Momoto
+Jepret, susun, bagikan.
+
+Kamu menerima ini karena bersedia mencoba Momoto lebih dulu. Tolong simpan detail
+masuk kamu untuk diri sendiri{{#PARTNER}}, dan berikan akun kedua itu hanya ke
+pasangan kamu{{/PARTNER}}.
+Syarat & Ketentuan: https://momotoldr.com/terms
+Kebijakan Privasi: https://momotoldr.com/privacy

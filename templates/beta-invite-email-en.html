@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>You're in the Momoto closed beta</title>
+    <!--
+      English version. beta-invite-email-id.html is the Indonesian one — change both if
+      you change either.
+
+      Mail-merge fields, matching the columns in testers.credentials.csv:
+        {{DISPLAY_NAME}}  e.g. "Tester 01"
+        {{USERNAME}}      e.g. "tester01"   ← what they log in with
+        {{PASSWORD}}      e.g. "rXbK9mTpQw4nHs"
+
+      The partner's second login is optional. Everything inside a "#PARTNER" marker
+      block (see below) is dropped for a row that has no second login — don't write
+      those markers out in full with their braces in this comment, or they'll be
+      matched and stripped along with the real ones:
+        {{PARTNER_USERNAME}}  e.g. "tester012"
+        {{PARTNER_PASSWORD}}  e.g. "pQ7mXbK9rTw4nH"
+
+      Built for email, not the web: table layout, inline styles, no external CSS or
+      webfonts, 600px wide. The <style> block below is progressive enhancement only —
+      every rule that matters is also inlined, because Gmail strips <style> in some
+      contexts and Outlook ignores much of it.
+    -->
+    <style>
+      @media only screen and (max-width: 620px) {
+        .container { width: 100% !important; }
+        .px { padding-left: 24px !important; padding-right: 24px !important; }
+        .h1 { font-size: 24px !important; line-height: 32px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f5f4f7; -webkit-font-smoothing:antialiased;">
+    <!-- Preheader: the grey preview line next to the subject. Hidden in the body. -->
+    <div style="display:none; font-size:1px; color:#f5f4f7; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      Your sign-in details are inside — you're one of a small group testing Momoto early.
+    </div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f5f4f7;">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+
+          <table role="presentation" class="container" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow:0 2px 8px rgba(15,23,42,0.06);">
+
+            <!-- Brand bar -->
+            <tr>
+              <td align="center" style="background:linear-gradient(160deg,#ffe3ec 0%,#fcf7f0 55%,#d9ffea 100%); background-color:#ffe3ec; padding:32px 24px 28px 24px;">
+                <img src="https://momotoldr.com/logo-momoto.png" width="56" height="52" alt="Momoto" style="display:block; border:0; width:56px; height:auto; margin:0 auto 12px auto;" />
+                <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#8a5a68;">
+                  Closed beta
+                </div>
+              </td>
+            </tr>
+
+            <!-- Body -->
+            <tr>
+              <td class="px" style="padding:36px 44px 8px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <h1 class="h1" style="margin:0 0 16px 0; font-size:28px; line-height:36px; font-weight:700; color:#0f172a;">
+                  You're in, {{DISPLAY_NAME}} 🎉
+                </h1>
+                <p style="margin:0 0 16px 0; font-size:15px; line-height:24px; color:#475569;">
+                  Momoto is a little studio of playful date experiences for long-distance
+                  relationships — starting with a photobooth you and your partner can use
+                  together, live, from two different places.
+                </p>
+                <p style="margin:0 0 8px 0; font-size:15px; line-height:24px; color:#475569;">
+                  We're testing with a small group before opening to everyone, and we'd love
+                  your honest opinion. Here's everything you need.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Credentials -->
+            <tr>
+              <td class="px" style="padding:20px 44px 8px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;">
+                  <tr>
+                    <td style="padding:22px 24px;">
+                      <div style="font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#64748b; padding-bottom:14px;">
+                        Your sign-in details
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Username</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; padding-bottom:14px;">
+                        {{USERNAME}}
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Password</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; letter-spacing:0.5px;">
+                        {{PASSWORD}}
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+{{#PARTNER}}
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#fdf6f9; border:1px solid #f0d9e4; border-radius:14px; margin-top:12px;">
+                  <tr>
+                    <td style="padding:22px 24px;">
+                      <div style="font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#b06585; padding-bottom:14px;">
+                        Your partner's sign-in details
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Username</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; padding-bottom:14px;">
+                        {{PARTNER_USERNAME}}
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Password</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; letter-spacing:0.5px; padding-bottom:14px;">
+                        {{PARTNER_PASSWORD}}
+                      </div>
+
+                      <div style="font-size:13px; line-height:20px; color:#64748b;">
+                        This second account is for your partner — <strong style="color:#334155;">pass these details on to them</strong>.
+                        Once they're in, they can change their own display name and password under Profile.
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+{{/PARTNER}}
+
+                <p style="margin:12px 0 0 0; font-size:13px; line-height:20px; color:#64748b;">
+                  Sign in with the <strong style="color:#334155;">username above, not an email address</strong>.
+                </p>
+              </td>
+            </tr>
+
+            <!-- CTA -->
+            <tr>
+              <td class="px" align="center" style="padding:28px 44px 8px 44px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="background-color:#0f172a; border-radius:10px;">
+                      <a href="https://momotoldr.com/login" style="display:inline-block; padding:14px 34px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none;">
+                        Sign in to Momoto
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:12px 0 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; color:#94a3b8;">
+                  or go to momotoldr.com/login
+                </p>
+              </td>
+            </tr>
+
+            <!-- Housekeeping: what they can change once they're in -->
+            <tr>
+              <td class="px" style="padding:28px 44px 0 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <div style="border-top:1px solid #e2e8f0; padding-top:26px;">
+                  <h2 style="margin:0 0 14px 0; font-size:17px; line-height:24px; font-weight:700; color:#0f172a;">
+                    Once you're in
+                  </h2>
+                  <p style="margin:0 0 0 0; font-size:15px; line-height:23px; color:#334155;">
+                    Open <strong style="color:#0f172a;">Profile</strong> to change this password to
+                    something you'll remember, and to confirm your email address. Confirming it is
+                    what lets you reset your own password later — until then, you'd have to ask us.
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- How to shoot together -->
+            <tr>
+              <td class="px" style="padding:28px 44px 0 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <div style="border-top:1px solid #e2e8f0; padding-top:26px;">
+                  <h2 style="margin:0 0 14px 0; font-size:17px; line-height:24px; font-weight:700; color:#0f172a;">
+                    Shooting with your partner
+                  </h2>
+{{#PARTNER}}
+                  <p style="margin:0 0 14px 0; font-size:14px; line-height:22px; color:#475569;">
+                    Make sure your partner has <strong style="color:#334155;">signed in with their own account</strong> first.
+                  </p>
+{{/PARTNER}}
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">1.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569; padding-bottom:10px;">
+                        Open the photobooth and start a <strong style="color:#334155;">date</strong> session.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">2.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569; padding-bottom:10px;">
+                        Tap the <strong style="color:#334155;">room code</strong> to copy it, and send it to your partner.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">3.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569;">
+                        They enter that code to join, and you're both in the same booth.
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin:14px 0 0 0; font-size:13px; line-height:20px; color:#94a3b8;">
+                    Each code works for one session — start a new room and you'll get a new one.
+                    There's also a partner link under Profile; it's optional and you don't need it
+                    to take photos together.
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Feedback ask -->
+            <tr>
+              <td class="px" style="padding:26px 44px 36px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f0fdf7; border-radius:14px;">
+                  <tr>
+                    <td style="padding:18px 22px; font-size:14px; line-height:22px; color:#3f6b58;">
+                      Anything that felt slow, broke, or just annoyed you — please tell us. There's
+                      a feedback button in the corner of every page, and replying to this email
+                      works too.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="px" style="padding:22px 44px 30px 44px; background-color:#fafafa; border-top:1px solid #eef2f6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <p style="margin:0 0 6px 0; font-size:13px; font-weight:700; color:#334155;">Momoto</p>
+                <p style="margin:0 0 12px 0; font-size:12px; line-height:18px; color:#94a3b8;">
+                  Snap, strip, share.
+                </p>
+                <p style="margin:0; font-size:11px; line-height:18px; color:#a3aab5;">
+                  You're getting this because you agreed to try Momoto early. Please keep your own
+                  sign-in details to yourself{{#PARTNER}}, and give the second account only to your partner{{/PARTNER}}.
+                  <br />
+                  <a href="https://momotoldr.com/terms" style="color:#94a3b8;">Terms</a> ·
+                  <a href="https://momotoldr.com/privacy" style="color:#94a3b8;">Privacy</a>
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

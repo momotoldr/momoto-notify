@@ -1,0 +1,57 @@
+Subject: You're in the Momoto closed beta
+
+Hi {{DISPLAY_NAME}},
+
+Momoto is a little studio of playful date experiences for long-distance
+relationships — starting with a photobooth you and your partner can use
+together, live, from two different places.
+
+We're testing with a small group before opening to everyone, and we'd love your
+honest opinion.
+
+YOUR SIGN-IN DETAILS
+  Sign in at: https://momotoldr.com/login
+  Username:   {{USERNAME}}
+  Password:   {{PASSWORD}}
+
+{{#PARTNER}}
+YOUR PARTNER'S SIGN-IN DETAILS
+  Username:   {{PARTNER_USERNAME}}
+  Password:   {{PARTNER_PASSWORD}}
+
+  This second account is for your partner — pass the details above on to them.
+  Once they're in, they can change their own display name and password under
+  Profile.
+
+{{/PARTNER}}
+Sign in with the username above, not an email address.
+
+ONCE YOU'RE IN
+  Open Profile to change this password to something you'll remember, and to
+  confirm your email address. Confirming it is what lets you reset your own
+  password later — until then, you'd have to ask us.
+
+SHOOTING WITH YOUR PARTNER
+{{#PARTNER}}
+  Make sure your partner has signed in with their own account first.
+
+{{/PARTNER}}
+  1. Open the photobooth and start a "date" session.
+  2. Tap the room code to copy it, and send it to your partner.
+  3. They enter that code to join, and you're both in the same booth.
+
+Each code works for one session — start a new room and you'll get a new one.
+There's also a partner link under Profile; it's optional, and you don't need it
+to take photos together.
+
+Anything that felt slow, broke, or just annoyed you — please tell us. There's a
+feedback button in the corner of every page, and replying to this email works
+too.
+
+— Momoto
+Snap, strip, share.
+
+You're getting this because you agreed to try Momoto early. Please keep your own
+sign-in details to yourself{{#PARTNER}}, and give the second account only to your
+partner{{/PARTNER}}.
+Terms: https://momotoldr.com/terms · Privacy: https://momotoldr.com/privacy

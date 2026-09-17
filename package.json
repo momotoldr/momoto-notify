@@ -1,0 +1,39 @@
+{
+  "name": "momoto-notify",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Momoto notification service — the single place any outbound email is rendered and sent.",
+  "engines": {
+    "node": ">=20"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.0",
+    "helmet": "^8.3.0",
+    "nodemailer": "^9.0.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.11.0",
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.5.5",
+    "@types/nodemailer": "^8.0.1",
+    "eslint": "^9.11.0",
+    "eslint-config-prettier": "^9.1.0",
+    "globals": "^15.9.0",
+    "prettier": "^3.3.3",
+    "tsx": "^4.19.1",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.6.0"
+  }
+}

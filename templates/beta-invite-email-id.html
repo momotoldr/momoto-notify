@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="x-apple-disable-message-reformatting" />
+    <title>Kamu masuk beta tertutup Momoto</title>
+    <!--
+      Versi Bahasa Indonesia dari beta-invite-email-en.html — kalau salah satu diubah,
+      ubah keduanya.
+
+      Kolom mail-merge, sama dengan kolom di testers.credentials.csv:
+        {{DISPLAY_NAME}}  mis. "Tester 01"
+        {{USERNAME}}      mis. "tester01"   ← ini yang dipakai untuk masuk
+        {{PASSWORD}}      mis. "rXbK9mTpQw4nHs"
+
+      Login kedua untuk pasangan bersifat opsional. Semua yang ada di dalam blok
+      penanda "#PARTNER" (lihat di bawah) akan dihapus kalau baris itu tidak punya
+      login kedua — jangan tulis penanda itu lengkap dengan kurung kurawal di komentar
+      ini, karena akan ikut terbaca dan terhapus:
+        {{PARTNER_USERNAME}}  mis. "tester012"
+        {{PARTNER_PASSWORD}}  mis. "pQ7mXbK9rTw4nH"
+
+      Dibuat untuk email, bukan web: layout tabel, style inline, tanpa CSS atau webfont
+      eksternal, lebar 600px. Blok <style> di bawah hanya penyempurnaan — semua aturan
+      penting sudah inline, karena Gmail kadang membuang <style> dan Outlook mengabaikan
+      sebagian besar isinya.
+    -->
+    <style>
+      @media only screen and (max-width: 620px) {
+        .container { width: 100% !important; }
+        .px { padding-left: 24px !important; padding-right: 24px !important; }
+        .h1 { font-size: 24px !important; line-height: 32px !important; }
+      }
+    </style>
+  </head>
+  <body style="margin:0; padding:0; background-color:#f5f4f7; -webkit-font-smoothing:antialiased;">
+    <!-- Preheader: baris abu-abu di samping subjek. Tersembunyi di badan email. -->
+    <div style="display:none; font-size:1px; color:#f5f4f7; line-height:1px; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+      Detail masuk kamu ada di dalam — kamu salah satu dari sedikit orang yang mencoba Momoto lebih dulu.
+    </div>
+
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f5f4f7;">
+      <tr>
+        <td align="center" style="padding:32px 12px;">
+
+          <table role="presentation" class="container" cellpadding="0" cellspacing="0" border="0" width="600" style="width:600px; max-width:600px; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow:0 2px 8px rgba(15,23,42,0.06);">
+
+            <!-- Bar merek -->
+            <tr>
+              <td align="center" style="background:linear-gradient(160deg,#ffe3ec 0%,#fcf7f0 55%,#d9ffea 100%); background-color:#ffe3ec; padding:32px 24px 28px 24px;">
+                <img src="https://momotoldr.com/logo-momoto.png" width="56" height="52" alt="Momoto" style="display:block; border:0; width:56px; height:auto; margin:0 auto 12px auto;" />
+                <div style="font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:11px; font-weight:700; letter-spacing:1.6px; text-transform:uppercase; color:#8a5a68;">
+                  Beta tertutup
+                </div>
+              </td>
+            </tr>
+
+            <!-- Isi -->
+            <tr>
+              <td class="px" style="padding:36px 44px 8px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <h1 class="h1" style="margin:0 0 16px 0; font-size:28px; line-height:36px; font-weight:700; color:#0f172a;">
+                  Kamu ikut, {{DISPLAY_NAME}} 🎉
+                </h1>
+                <p style="margin:0 0 16px 0; font-size:15px; line-height:24px; color:#475569;">
+                  Momoto adalah studio kecil berisi pengalaman kencan yang menyenangkan untuk
+                  hubungan jarak jauh — dimulai dari photobooth yang bisa kamu dan pasangan
+                  pakai bareng, langsung, dari dua tempat berbeda.
+                </p>
+                <p style="margin:0 0 8px 0; font-size:15px; line-height:24px; color:#475569;">
+                  Kami sedang menguji bersama sekelompok kecil orang sebelum dibuka untuk semua,
+                  dan kami ingin sekali dengar pendapat jujur kamu. Ini semua yang kamu butuhkan.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Detail masuk -->
+            <tr>
+              <td class="px" style="padding:20px 44px 8px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;">
+                  <tr>
+                    <td style="padding:22px 24px;">
+                      <div style="font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#64748b; padding-bottom:14px;">
+                        Detail masuk kamu
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Nama pengguna</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; padding-bottom:14px;">
+                        {{USERNAME}}
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Kata sandi</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; letter-spacing:0.5px;">
+                        {{PASSWORD}}
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+{{#PARTNER}}
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#fdf6f9; border:1px solid #f0d9e4; border-radius:14px; margin-top:12px;">
+                  <tr>
+                    <td style="padding:22px 24px;">
+                      <div style="font-size:11px; font-weight:700; letter-spacing:1.2px; text-transform:uppercase; color:#b06585; padding-bottom:14px;">
+                        Detail masuk untuk pasangan kamu
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Nama pengguna</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; padding-bottom:14px;">
+                        {{PARTNER_USERNAME}}
+                      </div>
+
+                      <div style="font-size:12px; color:#64748b; padding-bottom:4px;">Kata sandi</div>
+                      <div style="font-family:'SFMono-Regular',Menlo,Consolas,monospace; font-size:17px; font-weight:700; color:#0f172a; letter-spacing:0.5px; padding-bottom:14px;">
+                        {{PARTNER_PASSWORD}}
+                      </div>
+
+                      <div style="font-size:13px; line-height:20px; color:#64748b;">
+                        Akun kedua ini untuk pasangan kamu — <strong style="color:#334155;">kirimkan detail di atas ke dia</strong>.
+                        Setelah masuk, dia bisa mengganti nama tampilan dan kata sandinya sendiri lewat Profil.
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+{{/PARTNER}}
+
+                <p style="margin:12px 0 0 0; font-size:13px; line-height:20px; color:#64748b;">
+                  Masuk pakai <strong style="color:#334155;">nama pengguna di atas, bukan alamat email</strong>.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Tombol -->
+            <tr>
+              <td class="px" align="center" style="padding:28px 44px 8px 44px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td align="center" style="background-color:#0f172a; border-radius:10px;">
+                      <a href="https://momotoldr.com/login" style="display:inline-block; padding:14px 34px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:15px; font-weight:700; color:#ffffff; text-decoration:none;">
+                        Masuk ke Momoto
+                      </a>
+                    </td>
+                  </tr>
+                </table>
+                <p style="margin:12px 0 0 0; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif; font-size:12px; color:#94a3b8;">
+                  atau buka momotoldr.com/login
+                </p>
+              </td>
+            </tr>
+
+            <!-- Hal yang bisa diubah setelah masuk -->
+            <tr>
+              <td class="px" style="padding:28px 44px 0 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <div style="border-top:1px solid #e2e8f0; padding-top:26px;">
+                  <h2 style="margin:0 0 14px 0; font-size:17px; line-height:24px; font-weight:700; color:#0f172a;">
+                    Setelah kamu masuk
+                  </h2>
+                  <p style="margin:0 0 0 0; font-size:15px; line-height:23px; color:#334155;">
+                    Buka <strong style="color:#0f172a;">Profil</strong> untuk mengganti kata sandi ini
+                    dengan yang lebih mudah kamu ingat, dan untuk mengonfirmasi alamat emailmu.
+                    Konfirmasi itulah yang membuat kamu bisa mengatur ulang kata sandi sendiri nanti —
+                    sebelum itu, kamu harus minta bantuan kami.
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Cara jepret bareng -->
+            <tr>
+              <td class="px" style="padding:28px 44px 0 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <div style="border-top:1px solid #e2e8f0; padding-top:26px;">
+                  <h2 style="margin:0 0 14px 0; font-size:17px; line-height:24px; font-weight:700; color:#0f172a;">
+                    Jepret bareng pasangan
+                  </h2>
+{{#PARTNER}}
+                  <p style="margin:0 0 14px 0; font-size:14px; line-height:22px; color:#475569;">
+                    Pastikan pasangan kamu sudah <strong style="color:#334155;">masuk pakai akun keduanya</strong> lebih dulu.
+                  </p>
+{{/PARTNER}}
+                  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">1.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569; padding-bottom:10px;">
+                        Buka photobooth, lalu mulai sesi <strong style="color:#334155;">date</strong>.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">2.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569; padding-bottom:10px;">
+                        Ketuk <strong style="color:#334155;">kode ruang</strong> untuk menyalinnya, lalu kirim ke pasangan kamu.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td width="26" valign="top" style="font-size:14px; line-height:22px; font-weight:700; color:#d1799a;">3.</td>
+                      <td style="font-size:14px; line-height:22px; color:#475569;">
+                        Dia memasukkan kode itu untuk bergabung, dan kalian berdua ada di booth yang sama.
+                      </td>
+                    </tr>
+                  </table>
+
+                  <p style="margin:14px 0 0 0; font-size:13px; line-height:20px; color:#94a3b8;">
+                    Satu kode berlaku untuk satu sesi — buat ruang baru, kodenya juga baru. Ada juga
+                    tautan pasangan di menu Profil; itu opsional, dan kamu tidak perlu itu untuk
+                    berfoto bareng.
+                  </p>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Minta masukan -->
+            <tr>
+              <td class="px" style="padding:26px 44px 36px 44px; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f0fdf7; border-radius:14px;">
+                  <tr>
+                    <td style="padding:18px 22px; font-size:14px; line-height:22px; color:#3f6b58;">
+                      Apa pun yang terasa lambat, rusak, atau bikin kesal — tolong beri tahu kami.
+                      Ada tombol masukan di pojok setiap halaman, dan membalas email ini juga bisa.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td class="px" style="padding:22px 44px 30px 44px; background-color:#fafafa; border-top:1px solid #eef2f6; font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+                <p style="margin:0 0 6px 0; font-size:13px; font-weight:700; color:#334155;">Momoto</p>
+                <p style="margin:0 0 12px 0; font-size:12px; line-height:18px; color:#94a3b8;">
+                  Jepret, susun, bagikan.
+                </p>
+                <p style="margin:0; font-size:11px; line-height:18px; color:#a3aab5;">
+                  Kamu menerima ini karena bersedia mencoba Momoto lebih dulu. Tolong simpan detail
+                  masuk kamu untuk diri sendiri{{#PARTNER}}, dan berikan akun kedua itu hanya ke pasangan kamu{{/PARTNER}}.
+                  <br />
+                  <a href="https://momotoldr.com/terms" style="color:#94a3b8;">Syarat &amp; Ketentuan</a> ·
+                  <a href="https://momotoldr.com/privacy" style="color:#94a3b8;">Kebijakan Privasi</a>
+                </p>
+              </td>
+            </tr>
+
+          </table>
+
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
