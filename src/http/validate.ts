@@ -12,7 +12,6 @@ const TYPES = new Set<NotificationType>([
   'password_reset',
   'password_changed',
   'beta_invite',
-  'booth_reminder',
 ])
 
 /** Loose on purpose, mirroring the backend's own check. Delivery is the real test. */
@@ -63,7 +62,12 @@ export function parseNotification(body: unknown): NotificationRequest | string {
     case 'verify_email': {
       const link = url(data.url)
       if (!link) return 'verify_email needs a http(s) "data.url"'
-      return { type, to, lang, data: { url: link, expiresInHours: positive(data.expiresInHours, 24) } }
+      return {
+        type,
+        to,
+        lang,
+        data: { url: link, expiresInHours: positive(data.expiresInHours, 24) },
+      }
     }
     case 'password_reset': {
       const link = url(data.url)
@@ -109,13 +113,6 @@ export function parseNotification(body: unknown): NotificationRequest | string {
           ...(partnerUsername && partnerPassword ? { partnerUsername, partnerPassword } : {}),
         },
       }
-    }
-    case 'booth_reminder': {
-      const displayName = str(data.displayName, 60)
-      const link = url(data.url)
-      if (!displayName) return 'booth_reminder needs a "data.displayName"'
-      if (!link) return 'booth_reminder needs a http(s) "data.url"'
-      return { type, to, lang, data: { displayName, url: link } }
     }
   }
 }

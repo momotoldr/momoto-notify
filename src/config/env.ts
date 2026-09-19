@@ -120,5 +120,9 @@ export const env: Env = {
   smtp: parseSmtp(),
   maxAttempts: positiveInt('NOTIFY_MAX_ATTEMPTS', process.env.NOTIFY_MAX_ATTEMPTS, 3),
   retryDelayMs: positiveInt('NOTIFY_RETRY_DELAY_MS', process.env.NOTIFY_RETRY_DELAY_MS, 30_000),
-  sendIntervalMs: positiveInt('NOTIFY_SEND_INTERVAL_MS', process.env.NOTIFY_SEND_INTERVAL_MS, 1_000),
+  sendIntervalMs: positiveInt(
+    'NOTIFY_SEND_INTERVAL_MS',
+    process.env.NOTIFY_SEND_INTERVAL_MS,
+    1_000,
+  ),
 }
