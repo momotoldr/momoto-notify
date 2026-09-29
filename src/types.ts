@@ -11,11 +11,7 @@
 
 /** Every kind of message this service can send. */
 export type NotificationType =
-  | 'verify_email'
-  | 'password_reset'
-  | 'password_changed'
-  | 'beta_invite'
-  | 'booth_reminder'
+  'verify_email' | 'password_reset' | 'password_changed' | 'beta_invite'
 
 /** The locales Momoto ships. Anything else is treated as English. */
 export type Lang = 'en' | 'id'
@@ -58,19 +54,12 @@ export interface BetaInviteData {
   partnerPassword?: string
 }
 
-export interface BoothReminderData {
-  displayName: string
-  /** Finished link to the booth. Built by the caller — see the note at the top. */
-  url: string
-}
-
 /** A request to send one message to one person. */
 export type NotificationRequest =
   | { type: 'verify_email'; to: string; lang?: Lang; data: VerifyEmailData }
   | { type: 'password_reset'; to: string; lang?: Lang; data: PasswordResetData }
   | { type: 'password_changed'; to: string; lang?: Lang; data: PasswordChangedData }
   | { type: 'beta_invite'; to: string; lang?: Lang; data: BetaInviteData }
-  | { type: 'booth_reminder'; to: string; lang?: Lang; data: BoothReminderData }
 
 /** A rendered message, ready for the transport. */
 export interface RenderedMail {

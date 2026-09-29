@@ -1,7 +1,6 @@
 import type { Lang, NotificationRequest, RenderedMail } from '../types.js'
 
 import { betaInvite } from './templates/betaInvite.js'
-import { boothReminder } from './templates/boothReminder.js'
 import { passwordChanged } from './templates/passwordChanged.js'
 import { passwordReset } from './templates/passwordReset.js'
 import { verifyEmail } from './templates/verifyEmail.js'
@@ -27,7 +26,5 @@ export function render(request: NotificationRequest): RenderedMail {
       return passwordChanged(request.data, lang)
     case 'beta_invite':
       return betaInvite(request.data, lang)
-    case 'booth_reminder':
-      return boothReminder(request.data, lang)
   }
 }

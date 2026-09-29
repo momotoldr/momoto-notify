@@ -1,0 +1,9 @@
+dist/
+node_modules/
+# Hand-authored docs (tables/wrapping are intentional).
+*.md
+
+# Email templates. Hand-written HTML with `{{PLACEHOLDER}}` and `{{#PARTNER}}` blocks,
+# laid out for mail clients rather than for a formatter — reflowing them risks the
+# table layout the design depends on, for no gain.
+templates/
