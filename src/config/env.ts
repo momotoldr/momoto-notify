@@ -52,6 +52,19 @@ export interface Env {
   retryDelayMs: number
   /** Pause between consecutive sends. Shared mailboxes throttle per hour. */
   sendIntervalMs: number
+  /**
+   * Most messages one lane may hold before new ones are refused with 503. Per lane, so
+   * a bulk backlog can't stop a reset link being accepted. At a send every ~1–2s, the
+   * default is several hours of backlog — mail queued past that is too late to matter.
+   */
+  maxQueued: number
+  /**
+   * How long a shutdown keeps sending what's queued before exiting. Must sit below the
+   * platform's kill deadline — on Railway, `RAILWAY_DEPLOYMENT_DRAINING_SECONDS`, which
+   * defaults to **0**: with that unset, SIGTERM is followed by SIGKILL at once and none
+   * of this gets to run.
+   */
+  shutdownGraceMs: number
 }
 
 function positiveInt(name: string, raw: string | undefined, fallback: number): number {
@@ -124,5 +137,11 @@ export const env: Env = {
     'NOTIFY_SEND_INTERVAL_MS',
     process.env.NOTIFY_SEND_INTERVAL_MS,
     1_000,
+  ),
+  maxQueued: positiveInt('NOTIFY_MAX_QUEUED', process.env.NOTIFY_MAX_QUEUED, 10_000),
+  shutdownGraceMs: positiveInt(
+    'NOTIFY_SHUTDOWN_GRACE_MS',
+    process.env.NOTIFY_SHUTDOWN_GRACE_MS,
+    25_000,
   ),
 }

@@ -10,12 +10,20 @@ import type { RenderedMail } from '../types.js'
  * Built on first use rather than at import, so a bad password surfaces on the first
  * send instead of taking the whole service down at boot over a mailbox that may not
  * be needed for hours.
+ *
+ * **Pooled, one connection.** Unpooled, nodemailer dials, TLS-handshakes and
+ * authenticates for every single message — often longer than the send itself. The
+ * pool keeps that one connection open across sends and redials when the server drops
+ * it. One, because the queue is a single consumer anyway: more connections would sit
+ * idle, and a shared mailbox counts concurrent sessions against you.
  */
 let transport: Transporter | null = null
 
 function getTransport(): Transporter | null {
   if (!env.smtp) return null
   transport ??= nodemailer.createTransport({
+    pool: true,
+    maxConnections: 1,
     host: env.smtp.host,
     port: env.smtp.port,
     // 465 is implicit TLS; 587 upgrades via STARTTLS.
@@ -32,6 +40,12 @@ function getTransport(): Transporter | null {
     greetingTimeout: env.smtp.connectionTimeoutMs,
   })
   return transport
+}
+
+/** Closes the pooled connection, so a shutdown says QUIT instead of dropping the socket. */
+export function closeTransport(): void {
+  transport?.close()
+  transport = null
 }
 
 /**

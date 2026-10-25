@@ -2,28 +2,30 @@
 
 The one place any outbound email is rendered and sent.
 
-Before this existed, sending was spread across two transports and two template
-systems: `momoto-core` had an in-process nodemailer client for verification and reset
-mail, and `scripts/sendInvites.ts` built a second transport of its own to mail the
-beta invitations from hand-edited HTML at the repo root. Two copies of the SMTP
-config, two places to change a footer, and no shared retry or pacing.
+Before this existed, `momoto-core` sent mail in-process and an operator script ran a
+second transport of its own: two copies of the SMTP config, two places to change a
+footer, and no shared retry or pacing.
 
 ## What it does
 
 - Owns the SMTP credentials. **No other service has them.**
 - Owns every template: address verification, password reset, password-changed notice,
-  and the beta invitation.
+  and the payment receipt.
 - Accepts a message, answers `202` immediately, and sends on its own schedule with
-  retries and a pause between sends.
+  retries and a pause between sends, over one pooled SMTP connection.
+- Two lanes: `urgent` (verification, reset, password-changed) always goes before
+  `bulk` (payment receipts). Each lane holds at most `NOTIFY_MAX_QUEUED`
+  messages; past that, new ones are refused with `503 queue_full`.
 
 ## What it deliberately does not do
 
 - **No CORS, ever.** Nothing in a browser should call this. The callers are servers
   holding a secret that must never reach a page.
-- **No persistence.** The queue is in memory: a crash or redeploy drops whatever
-  hasn't gone out. That is an acceptable trade because every message here is
-  re-requestable — Resend in Profile, ask for another reset link, re-run the invite
-  script (it skips anyone already in its sent log). When delivery has to be auditable,
+- **No persistence.** The queue is in memory. A redeploy sends what's queued first
+  (up to `NOTIFY_SHUTDOWN_GRACE_MS`, see *Deploying* below), but a crash drops whatever
+  hasn't gone out. That is an acceptable trade for mail that is re-requestable —
+  Resend in Profile, ask for another reset link. **Payment receipts are not**: nothing re-sends
+  one, so a receipt queued during a redeploy is lost. When delivery has to be auditable,
   add a table with the shape of `Job` in `src/queue.ts` plus a status column; the HTTP
   API doesn't change.
 - **No knowledge of frontend routes.** Callers pass finished URLs. A confirmation link
@@ -34,9 +36,9 @@ config, two places to change a footer, and no shared retry or pacing.
 
 Every route needs `Authorization: Bearer $NOTIFY_API_KEY`.
 
-    POST /notifications          → 202 { id }   queue one message
+    POST /notifications          → 202 { id }   queue one message (503 queue_full when its lane is full)
     POST /notifications/preview  → 200 { subject, text, html }   render without sending
-    GET  /healthz                → 200 { status, uptime, pending }
+    GET  /healthz                → 200 { status, uptime, pending, lanes: { urgent, bulk } }
 
 Body:
 
@@ -56,26 +58,33 @@ Types and their `data`:
 | `verify_email` | `url`, `expiresInHours` |
 | `password_reset` | `url`, `expiresInMinutes` |
 | `password_changed` | `resetUrl` |
-| `beta_invite` | `displayName`, `username`, `password` |
+| `payment_receipt` | `orderId`, `grossAmount`, `paidAt`, `method`, `stripCount`, `scrapbookTitles` |
 
 ## A note on what crosses the wire
 
-`beta_invite` carries a **plaintext password**, and the two link types carry
-**single-use credentials**. Run this service on a private network, or over HTTPS if it
+The verification and reset links carry **single-use credentials**. Run this service on a private network, or over HTTPS if it
 is reachable publicly — and never point `NOTIFY_URL` at a plain-HTTP host you don't
 control the whole path to.
 
 ## Templates
 
-The transactional ones are TypeScript in `src/mail/templates/` — short, generated,
-better off sharing a layout than drifting apart.
+All TypeScript in `src/mail/templates/`, sharing one layout (`src/mail/layout.ts`)
+rather than drifting apart. `POST /notifications/preview` renders any of them without
+sending.
 
-The beta invitation is **files** in `templates/` (`beta-invite-email-{en,id}.{html,txt}`),
-because it is hand-designed table-layout email HTML that an operator edits and previews
-before each wave. `send:invites --dry-run` renders it through `/notifications/preview`,
-so the preview is the real thing rather than a copy.
+## Deploying
 
-Placeholders: `{{DISPLAY_NAME}}`, `{{USERNAME}}`, `{{PASSWORD}}`.
+On SIGTERM the service stops accepting connections and keeps sending what's queued —
+urgent lane first, retry backoffs skipped — until the queue is empty or
+`NOTIFY_SHUTDOWN_GRACE_MS` (default 25 s) passes. On Railway that needs:
+
+- Start command `node dist/index.js`, **not** `npm start` (npm swallows SIGTERM).
+- `RAILWAY_DEPLOYMENT_DRAINING_SECONDS=30` — the default 0 kills the process at once.
+- `RAILWAY_DEPLOYMENT_OVERLAP_SECONDS=10` — callers refused by the old instance retry
+  against the new one (`momoto-core` retries a refused connection once).
+
+Logs: `notify.shutdown` → `notify.shutdown.drained`, or `notify.dropped` per message
+left at the deadline.
 
 ## Running it
 

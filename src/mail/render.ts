@@ -1,8 +1,8 @@
 import type { Lang, NotificationRequest, RenderedMail } from '../types.js'
 
-import { betaInvite } from './templates/betaInvite.js'
 import { passwordChanged } from './templates/passwordChanged.js'
 import { passwordReset } from './templates/passwordReset.js'
+import { paymentReceipt } from './templates/paymentReceipt.js'
 import { verifyEmail } from './templates/verifyEmail.js'
 
 /** Anything that isn't a locale we ship falls back to English. */
@@ -24,7 +24,7 @@ export function render(request: NotificationRequest): RenderedMail {
       return passwordReset(request.data, lang)
     case 'password_changed':
       return passwordChanged(request.data, lang)
-    case 'beta_invite':
-      return betaInvite(request.data, lang)
+    case 'payment_receipt':
+      return paymentReceipt(request.data, lang)
   }
 }
