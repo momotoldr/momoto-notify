@@ -1,11 +1,6 @@
 /**
- * The shared chrome for the transactional emails, matching the beta invitation.
- *
- * The invitation is hand-written HTML in `templates/`; this is the same design
- * expressed as a function, so verification and reset mail arrive looking like they
- * came from the same product rather than from its error handler. Any visual change
- * has to be made in both places — that is the cost of keeping the invitation
- * hand-editable, and it is deliberate.
+ * The shared chrome for every email, so each one arrives looking like it came from
+ * the same product rather than from its error handler.
  *
  * **Built for email clients, not browsers.** Table layout, inline styles, no external
  * CSS or webfonts, 600px wide. The `<style>` block is progressive enhancement only:
@@ -23,7 +18,7 @@ const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif"
 export interface LayoutOptions {
   /** The grey preview line shown next to the subject. Hidden inside the message. */
   preheader: string
-  /** Small uppercase label in the brand bar — the invitation's says "Closed beta". */
+  /** Small uppercase label in the brand bar, e.g. "Account security". */
   eyebrow: string
   heading: string
   /** Body copy. Inline HTML (a `<strong>`) is fine; anything else should be escaped. */
@@ -45,6 +40,16 @@ const FOOTER_TAGLINE: Record<'en' | 'id', string> = {
 const FOOTER_LINKS: Record<'en' | 'id', { terms: string; privacy: string }> = {
   en: { terms: 'Terms', privacy: 'Privacy' },
   id: { terms: 'Ketentuan', privacy: 'Privasi' },
+}
+
+/** For user-entered text going into the HTML part — a scrapbook title, say. */
+export function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
 }
 
 export function layout(options: LayoutOptions): string {
