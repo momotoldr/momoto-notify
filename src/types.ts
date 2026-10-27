@@ -13,6 +13,9 @@
 export type NotificationType =
   'verify_email' | 'password_reset' | 'password_changed' | 'payment_receipt'
 
+/** Strips in one scrapbook bundle — momoto-core's `BUNDLE_STRIPS`. */
+export const BUNDLE_STRIPS = 3
+
 /** The locales Momoto ships. Anything else is treated as English. */
 export type Lang = 'en' | 'id'
 
@@ -54,6 +57,17 @@ export interface PaymentReceiptData {
   stripCount: number
   /** User-entered titles, possibly empty (untitled) — escaped before they reach the HTML. */
   scrapbookTitles: string[]
+  /**
+   * Priced with the partner buy 1 get 1 (momoto-fe docs/PLAN-promos.md): two of the
+   * strips were charged as one. False from a core that predates the promos.
+   */
+  bogo: boolean
+  /**
+   * Scrapbook bundles in the order: each is one of the scrapbooks plus 3 of the strips,
+   * bought together for one price. Which book and which strips doesn't matter — they're
+   * priced alike — so the receipt pairs them up from the front.
+   */
+  bundled: number
 }
 
 /** A request to send one message to one person. */
