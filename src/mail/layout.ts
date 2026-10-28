@@ -27,6 +27,11 @@ export interface LayoutOptions {
   button?: { href: string; label: string }
   /** Tinted box under the body — where the "if this wasn't you" line belongs. */
   callout?: string
+  /**
+   * Space under the callout box, in px. Defaults to a one-line note's; the receipt's
+   * summary card gets more room before the footer (user, 2026-10-27).
+   */
+  calloutSpaceBelow?: number
   /** Fine print in the footer, above the Terms/Privacy links. */
   footnote: string
   lang: 'en' | 'id'
@@ -54,6 +59,7 @@ export function escapeHtml(value: string): string {
 
 export function layout(options: LayoutOptions): string {
   const { preheader, eyebrow, heading, paragraphs, button, callout, footnote, lang } = options
+  const calloutSpaceBelow = options.calloutSpaceBelow ?? 8
   const links = FOOTER_LINKS[lang]
 
   const body = paragraphs
@@ -82,7 +88,7 @@ export function layout(options: LayoutOptions): string {
   const calloutRow = callout
     ? `
             <tr>
-              <td class="px" style="padding:20px 44px 8px 44px; font-family:${FONT};">
+              <td class="px" style="padding:20px 44px ${calloutSpaceBelow}px 44px; font-family:${FONT};">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;">
                   <tr>
                     <td style="padding:18px 22px; font-size:14px; line-height:22px; color:#475569;">${callout}</td>

@@ -1,5 +1,11 @@
 import { escapeHtml, layout, textLayout } from '../layout.js'
-import type { Lang, PaymentMethod, PaymentReceiptData, RenderedMail } from '../../types.js'
+import {
+  BUNDLE_STRIPS,
+  type Lang,
+  type PaymentMethod,
+  type PaymentReceiptData,
+  type RenderedMail,
+} from '../../types.js'
 
 /**
  * Sent once, when a payment settles — the moment the strips and scrapbooks it covers
@@ -45,7 +51,11 @@ interface Copy {
   where: string
   labels: { order: string; date: string; method: string; items: string; total: string }
   strips: (n: number) => string
+  /** The two strips the partner buy 1 get 1 priced as one. */
+  bogoStrips: string
   scrapbook: (title: string) => string
+  /** One scrapbook bundle: the book and the strips bought with it. */
+  bundle: (title: string, strips: number) => string
   footnote: string
 }
 
@@ -59,7 +69,10 @@ const COPY: Record<Lang, Copy> = {
     where: 'They are on your account now, ready to download whenever you like.',
     labels: { order: 'Order', date: 'Paid', method: 'Method', items: 'Items', total: 'Total' },
     strips: (n) => (n === 1 ? '1 strip print' : `${n} strip prints`),
+    bogoStrips: 'Buy 1 Get 1: 2 strip prints for the price of 1 strip',
     scrapbook: (title) => (title ? `Scrapbook: ${title}` : 'Scrapbook'),
+    bundle: (title, strips) =>
+      `Scrapbook bundle: ${title ? `${title} + ` : 'scrapbook + '}${strips} strip prints`,
     footnote:
       "Don't recognise this payment? Use Contact support in the app and include the order id above.",
   },
@@ -72,7 +85,10 @@ const COPY: Record<Lang, Copy> = {
     where: 'Semuanya sudah ada di akunmu, siap diunduh kapan saja.',
     labels: { order: 'Pesanan', date: 'Dibayar', method: 'Metode', items: 'Item', total: 'Total' },
     strips: (n) => `${n} cetak strip`,
+    bogoStrips: 'Beli 1 Gratis 1: 2 cetak strip seharga 1 strip',
     scrapbook: (title) => (title ? `Scrapbook: ${title}` : 'Scrapbook'),
+    bundle: (title, strips) =>
+      `Paket Scrapbook: ${title ? `${title} + ` : 'scrapbook + '}${strips} cetak strip`,
     footnote:
       'Tidak merasa melakukan pembayaran ini? Pilih Hubungi bantuan di aplikasi dan sertakan nomor pesanan di atas.',
   },
@@ -80,9 +96,17 @@ const COPY: Record<Lang, Copy> = {
 
 export function paymentReceipt(data: PaymentReceiptData, lang: Lang): RenderedMail {
   const copy = COPY[lang]
+  // The promos are said on the lines they priced (momoto-fe docs/PLAN-promos.md): each
+  // bundle as one line — a scrapbook and the 3 strips bought with it — then the buy 1 get 1
+  // pair, then whatever was list price. Still no per-line amounts (`PaymentReceiptData`).
+  const looseStrips = data.stripCount - data.bundled * BUNDLE_STRIPS - (data.bogo ? 2 : 0)
   const items = [
-    ...(data.stripCount > 0 ? [copy.strips(data.stripCount)] : []),
-    ...data.scrapbookTitles.map(copy.scrapbook),
+    ...data.scrapbookTitles
+      .slice(0, data.bundled)
+      .map((title) => copy.bundle(title, BUNDLE_STRIPS)),
+    ...(data.bogo ? [copy.bogoStrips] : []),
+    ...(looseStrips > 0 ? [copy.strips(looseStrips)] : []),
+    ...data.scrapbookTitles.slice(data.bundled).map(copy.scrapbook),
   ]
   const rows: [string, string][] = [
     [copy.labels.order, data.orderId],
@@ -125,6 +149,7 @@ ${rows
       heading: copy.heading,
       paragraphs: [copy.intro, copy.where],
       callout: summary,
+      calloutSpaceBelow: 28,
       footnote: copy.footnote,
     }),
   }

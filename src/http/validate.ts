@@ -1,4 +1,9 @@
-import type { NotificationRequest, NotificationType, PaymentMethod } from '../types.js'
+import {
+  BUNDLE_STRIPS,
+  type NotificationRequest,
+  type NotificationType,
+  type PaymentMethod,
+} from '../types.js'
 
 /**
  * Validates an untrusted body into a `NotificationRequest`.
@@ -119,6 +124,16 @@ export function parseNotification(body: unknown): NotificationRequest | string {
         ? (data.method as PaymentMethod)
         : null
 
+      // The promos (momoto-fe docs/PLAN-promos.md). Both optional, so a core that predates
+      // them still sends a valid receipt; and kept honest — a bundle needs a scrapbook and
+      // 3 strips of the order, and buy 1 get 1 needs two of the strips left after them.
+      const bundled = Math.min(
+        count(data.bundled) ?? 0,
+        scrapbookTitles.length,
+        Math.floor(stripCount / BUNDLE_STRIPS),
+      )
+      const bogo = data.bogo === true && stripCount - bundled * BUNDLE_STRIPS >= 2
+
       return {
         type,
         to,
@@ -130,6 +145,8 @@ export function parseNotification(body: unknown): NotificationRequest | string {
           method,
           stripCount,
           scrapbookTitles,
+          bogo,
+          bundled,
         },
       }
     }
