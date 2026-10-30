@@ -24,8 +24,8 @@ import type { NotificationRequest, NotificationType } from './types.js'
  * can first (`flush`), but a crash drops whatever hasn't gone out, and there is no
  * record of what was sent. That is an
  * acceptable trade for mail that is re-requestable — Resend in Profile, ask for
- * another reset link. **The payment receipt is the exception**: nothing re-sends it, so one
- * lost here is lost for good. The upgrade, when delivery has to be auditable, is a
+ * another reset link. **The payment receipt and refund confirmation are the exception**:
+ * nothing re-sends them, so one lost here is lost for good. The upgrade, when delivery has to be auditable, is a
  * table with the same shape as `Job` below plus a status column; nothing about the
  * API changes.
  */
@@ -38,6 +38,7 @@ const LANE: Record<NotificationType, Lane> = {
   // A security notice — the reader may be someone whose account was just taken over.
   password_changed: 'urgent',
   payment_receipt: 'bulk',
+  refund_confirmation: 'bulk',
 }
 
 interface Job {

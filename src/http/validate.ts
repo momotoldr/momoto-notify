@@ -17,6 +17,7 @@ const TYPES = new Set<NotificationType>([
   'password_reset',
   'password_changed',
   'payment_receipt',
+  'refund_confirmation',
 ])
 
 const PAYMENT_METHODS = new Set<PaymentMethod>(['gopay', 'shopeepay', 'qris'])
@@ -149,6 +150,21 @@ export function parseNotification(body: unknown): NotificationRequest | string {
           bundled,
         },
       }
+    }
+    case 'refund_confirmation': {
+      const orderId = str(data.orderId, 100)
+      const amount = count(data.amount)
+      const refundedAt = str(data.refundedAt, 40)
+      if (!orderId || !amount || !refundedAt) {
+        return 'refund_confirmation needs "data.orderId", "data.amount" and "data.refundedAt"'
+      }
+      if (Number.isNaN(Date.parse(refundedAt))) {
+        return 'refund_confirmation "data.refundedAt" is not a date'
+      }
+      const method = PAYMENT_METHODS.has(data.method as PaymentMethod)
+        ? (data.method as PaymentMethod)
+        : null
+      return { type, to, lang, data: { orderId, amount, refundedAt, method } }
     }
   }
 }

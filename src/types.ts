@@ -11,7 +11,7 @@
 
 /** Every kind of message this service can send. */
 export type NotificationType =
-  'verify_email' | 'password_reset' | 'password_changed' | 'payment_receipt'
+  'verify_email' | 'password_reset' | 'password_changed' | 'payment_receipt' | 'refund_confirmation'
 
 /** Strips in one scrapbook bundle — momoto-core's `BUNDLE_STRIPS`. */
 export const BUNDLE_STRIPS = 3
@@ -70,12 +70,24 @@ export interface PaymentReceiptData {
   bundled: number
 }
 
+export interface RefundConfirmationData {
+  /** Our Midtrans `order_id` — what support asks for if the money doesn't show up. */
+  orderId: string
+  /** What went back, in whole rupiah. Always the full amount charged. */
+  amount: number
+  /** ISO timestamp of the refund. Rendered in Jakarta time. */
+  refundedAt: string
+  /** Where it went back to. Null when the channel isn't one we know; the line is then left out. */
+  method: PaymentMethod | null
+}
+
 /** A request to send one message to one person. */
 export type NotificationRequest =
   | { type: 'verify_email'; to: string; lang?: Lang; data: VerifyEmailData }
   | { type: 'password_reset'; to: string; lang?: Lang; data: PasswordResetData }
   | { type: 'password_changed'; to: string; lang?: Lang; data: PasswordChangedData }
   | { type: 'payment_receipt'; to: string; lang?: Lang; data: PaymentReceiptData }
+  | { type: 'refund_confirmation'; to: string; lang?: Lang; data: RefundConfirmationData }
 
 /** A rendered message, ready for the transport. */
 export interface RenderedMail {
