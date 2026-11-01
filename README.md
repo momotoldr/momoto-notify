@@ -59,6 +59,7 @@ Types and their `data`:
 | `password_reset` | `url`, `expiresInMinutes` |
 | `password_changed` | `resetUrl` |
 | `payment_receipt` | `orderId`, `grossAmount`, `paidAt`, `method`, `stripCount`, `scrapbookTitles` |
+| `refund_confirmation` | `orderId`, `amount`, `refundedAt`, `method` |
 
 ## A note on what crosses the wire
 
