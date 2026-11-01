@@ -39,6 +39,8 @@ const LANE: Record<NotificationType, Lane> = {
   password_changed: 'urgent',
   payment_receipt: 'bulk',
   refund_confirmation: 'bulk',
+  // Someone is waiting on an answer, but minutes don't matter — nothing in it expires.
+  support_reply: 'bulk',
 }
 
 interface Job {

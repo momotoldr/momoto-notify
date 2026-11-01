@@ -18,12 +18,16 @@ const TYPES = new Set<NotificationType>([
   'password_changed',
   'payment_receipt',
   'refund_confirmation',
+  'support_reply',
 ])
 
 const PAYMENT_METHODS = new Set<PaymentMethod>(['gopay', 'shopeepay', 'qris'])
 
 /** A cap on listed scrapbooks, matching nothing in particular — it only bounds the mail. */
 const MAX_RECEIPT_SCRAPBOOKS = 20
+
+/** An admin's reply — longer than any one support answer should need. */
+const MAX_SUPPORT_REPLY = 5000
 
 /** Loose on purpose, mirroring the backend's own check. Delivery is the real test. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -165,6 +169,14 @@ export function parseNotification(body: unknown): NotificationRequest | string {
         ? (data.method as PaymentMethod)
         : null
       return { type, to, lang, data: { orderId, amount, refundedAt, method } }
+    }
+    case 'support_reply': {
+      const ticket = str(data.ticket, 40)
+      const message = str(data.message, MAX_SUPPORT_REPLY)
+      if (!ticket || !message) {
+        return `support_reply needs "data.ticket" and a "data.message" of at most ${MAX_SUPPORT_REPLY} characters`
+      }
+      return { type, to, lang, data: { ticket, message } }
     }
   }
 }

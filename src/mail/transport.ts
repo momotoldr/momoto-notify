@@ -1,6 +1,6 @@
 import nodemailer, { type Transporter } from 'nodemailer'
 
-import { env } from '../config/env.js'
+import { env, type SmtpConfig } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 import type { RenderedMail } from '../types.js'
 
@@ -53,6 +53,15 @@ export function closeTransport(): void {
  * this replaced in `momoto-core`, the caller here is the queue, whose entire job is to
  * notice a failure and try again.
  */
+/**
+ * Where a support reply's blind copy goes: the mailbox customers answer into
+ * (`SMTP_REPLY_TO`), else the one we sign in as — always a real mailbox, and with a
+ * `From` of that same address (staging, prod), it is where their answers land too.
+ */
+function supportMailbox(smtp: SmtpConfig): string {
+  return smtp.replyTo ?? smtp.user
+}
+
 export async function deliver(to: string, mail: RenderedMail): Promise<void> {
   const smtp = env.smtp
   const tx = getTransport()
@@ -76,6 +85,7 @@ export async function deliver(to: string, mail: RenderedMail): Promise<void> {
     text: mail.text,
     html: mail.html,
     ...(smtp.replyTo ? { replyTo: smtp.replyTo } : {}),
+    ...(mail.copySupport ? { bcc: supportMailbox(smtp) } : {}),
   })
   // Deliberately not logging the address on the success path: a delivered mail is
   // routine, and the log is not the place to accumulate a list of user emails.
