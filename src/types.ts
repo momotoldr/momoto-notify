@@ -108,7 +108,7 @@ export interface RenderedMail {
   text: string
   html: string
   /**
-   * Blind-copy the support mailbox (`SMTP_REPLY_TO`). For a support reply: SMTP doesn't
+   * Blind-copy the support mailbox (`SMTP_REPLY_TO`, else `SMTP_USER`). For a support reply: SMTP doesn't
    * file a Sent copy, so without it the mailbox the customer answers into would hold
    * their reply but not what they're replying to.
    */
