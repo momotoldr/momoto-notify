@@ -60,6 +60,7 @@ Types and their `data`:
 | `password_changed` | `resetUrl` |
 | `payment_receipt` | `orderId`, `grossAmount`, `paidAt`, `method`, `stripCount`, `scrapbookTitles` |
 | `refund_confirmation` | `orderId`, `amount`, `refundedAt`, `method` |
+| `support_reply` | `ticket`, `message` (blind-copies `SMTP_REPLY_TO`) |
 
 ## A note on what crosses the wire
 

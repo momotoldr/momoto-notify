@@ -11,7 +11,12 @@
 
 /** Every kind of message this service can send. */
 export type NotificationType =
-  'verify_email' | 'password_reset' | 'password_changed' | 'payment_receipt' | 'refund_confirmation'
+  | 'verify_email'
+  | 'password_reset'
+  | 'password_changed'
+  | 'payment_receipt'
+  | 'refund_confirmation'
+  | 'support_reply'
 
 /** Strips in one scrapbook bundle — momoto-core's `BUNDLE_STRIPS`. */
 export const BUNDLE_STRIPS = 3
@@ -81,6 +86,13 @@ export interface RefundConfirmationData {
   method: PaymentMethod | null
 }
 
+export interface SupportReplyData {
+  /** The ticket as the admin console shows it ("SUP-0005") — the caller formats it. */
+  ticket: string
+  /** What the admin wrote, as plain text. Escaped, and its line breaks kept, in the HTML. */
+  message: string
+}
+
 /** A request to send one message to one person. */
 export type NotificationRequest =
   | { type: 'verify_email'; to: string; lang?: Lang; data: VerifyEmailData }
@@ -88,10 +100,17 @@ export type NotificationRequest =
   | { type: 'password_changed'; to: string; lang?: Lang; data: PasswordChangedData }
   | { type: 'payment_receipt'; to: string; lang?: Lang; data: PaymentReceiptData }
   | { type: 'refund_confirmation'; to: string; lang?: Lang; data: RefundConfirmationData }
+  | { type: 'support_reply'; to: string; lang?: Lang; data: SupportReplyData }
 
 /** A rendered message, ready for the transport. */
 export interface RenderedMail {
   subject: string
   text: string
   html: string
+  /**
+   * Blind-copy the support mailbox (`SMTP_REPLY_TO`). For a support reply: SMTP doesn't
+   * file a Sent copy, so without it the mailbox the customer answers into would hold
+   * their reply but not what they're replying to.
+   */
+  copySupport?: boolean
 }

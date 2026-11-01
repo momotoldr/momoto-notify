@@ -4,6 +4,7 @@ import { passwordChanged } from './templates/passwordChanged.js'
 import { passwordReset } from './templates/passwordReset.js'
 import { paymentReceipt } from './templates/paymentReceipt.js'
 import { refundConfirmation } from './templates/refundConfirmation.js'
+import { supportReply } from './templates/supportReply.js'
 import { verifyEmail } from './templates/verifyEmail.js'
 
 /** Anything that isn't a locale we ship falls back to English. */
@@ -29,5 +30,7 @@ export function render(request: NotificationRequest): RenderedMail {
       return paymentReceipt(request.data, lang)
     case 'refund_confirmation':
       return refundConfirmation(request.data, lang)
+    case 'support_reply':
+      return supportReply(request.data, lang)
   }
 }

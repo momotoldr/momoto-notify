@@ -76,6 +76,7 @@ export async function deliver(to: string, mail: RenderedMail): Promise<void> {
     text: mail.text,
     html: mail.html,
     ...(smtp.replyTo ? { replyTo: smtp.replyTo } : {}),
+    ...(mail.copySupport && smtp.replyTo ? { bcc: smtp.replyTo } : {}),
   })
   // Deliberately not logging the address on the success path: a delivered mail is
   // routine, and the log is not the place to accumulate a list of user emails.
