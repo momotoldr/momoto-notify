@@ -19,6 +19,7 @@ const TYPES = new Set<NotificationType>([
   'payment_receipt',
   'refund_confirmation',
   'support_reply',
+  'inactive_warning',
 ])
 
 const PAYMENT_METHODS = new Set<PaymentMethod>(['gopay', 'shopeepay', 'qris'])
@@ -28,6 +29,9 @@ const MAX_RECEIPT_SCRAPBOOKS = 20
 
 /** An admin's reply — longer than any one support answer should need. */
 const MAX_SUPPORT_REPLY = 5000
+
+/** A username — momoto-core caps them well below this. */
+const MAX_USERNAME = 64
 
 /** Loose on purpose, mirroring the backend's own check. Delivery is the real test. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -180,6 +184,18 @@ export function parseNotification(body: unknown): NotificationRequest | string {
         return `support_reply needs "data.ticket" and a "data.message" of at most ${MAX_SUPPORT_REPLY} characters`
       }
       return { type, to, lang, data: { ticket, message } }
+    }
+    case 'inactive_warning': {
+      const username = str(data.username, MAX_USERNAME)
+      const deleteOn = str(data.deleteOn, 40)
+      const daysLeft = count(data.daysLeft)
+      const signInUrl = url(data.signInUrl)
+      if (!username || !deleteOn || !daysLeft || !signInUrl) {
+        return 'inactive_warning needs "data.username", "data.deleteOn", a positive "data.daysLeft" and a http(s) "data.signInUrl"'
+      }
+      if (Number.isNaN(Date.parse(deleteOn)))
+        return 'inactive_warning "data.deleteOn" is not a date'
+      return { type, to, lang, data: { username, deleteOn, daysLeft, signInUrl } }
     }
   }
 }

@@ -17,6 +17,7 @@ export type NotificationType =
   | 'payment_receipt'
   | 'refund_confirmation'
   | 'support_reply'
+  | 'inactive_warning'
 
 /** Strips in one scrapbook bundle — momoto-core's `BUNDLE_STRIPS`. */
 export const BUNDLE_STRIPS = 3
@@ -99,6 +100,17 @@ export interface SupportReplyData {
   message: string
 }
 
+export interface InactiveWarningData {
+  /** Which account, since one person may hold several. Escaped before it reaches the HTML. */
+  username: string
+  /** ISO timestamp the account is due to be deleted. Rendered as a Jakarta date. */
+  deleteOn: string
+  /** Whole days until then, for the copy: 14 for the first warning, 3 for the final one. */
+  daysLeft: number
+  /** The sign-in page. Signing in is what cancels the deletion, so no token is needed. */
+  signInUrl: string
+}
+
 /** A request to send one message to one person. */
 export type NotificationRequest =
   | { type: 'verify_email'; to: string; lang?: Lang; data: VerifyEmailData }
@@ -107,6 +119,7 @@ export type NotificationRequest =
   | { type: 'payment_receipt'; to: string; lang?: Lang; data: PaymentReceiptData }
   | { type: 'refund_confirmation'; to: string; lang?: Lang; data: RefundConfirmationData }
   | { type: 'support_reply'; to: string; lang?: Lang; data: SupportReplyData }
+  | { type: 'inactive_warning'; to: string; lang?: Lang; data: InactiveWarningData }
 
 /** A rendered message, ready for the transport. */
 export interface RenderedMail {

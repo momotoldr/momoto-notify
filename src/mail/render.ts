@@ -1,5 +1,6 @@
 import type { Lang, NotificationRequest, RenderedMail } from '../types.js'
 
+import { inactiveWarning } from './templates/inactiveWarning.js'
 import { passwordChanged } from './templates/passwordChanged.js'
 import { passwordReset } from './templates/passwordReset.js'
 import { paymentReceipt } from './templates/paymentReceipt.js'
@@ -32,5 +33,7 @@ export function render(request: NotificationRequest): RenderedMail {
       return refundConfirmation(request.data, lang)
     case 'support_reply':
       return supportReply(request.data, lang)
+    case 'inactive_warning':
+      return inactiveWarning(request.data, lang)
   }
 }
