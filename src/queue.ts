@@ -41,6 +41,8 @@ const LANE: Record<NotificationType, Lane> = {
   refund_confirmation: 'bulk',
   // Someone is waiting on an answer, but minutes don't matter — nothing in it expires.
   support_reply: 'bulk',
+  // Days of notice, sent by an hourly job: nobody is waiting on it.
+  inactive_warning: 'bulk',
 }
 
 interface Job {

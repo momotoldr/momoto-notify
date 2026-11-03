@@ -61,6 +61,7 @@ Types and their `data`:
 | `payment_receipt` | `orderId`, `grossAmount`, `paidAt`, `method`, `stripCount`, `scrapbookTitles` |
 | `refund_confirmation` | `orderId`, `amount`, `refundedAt`, `method` |
 | `support_reply` | `ticket`, `message` (blind-copies `SMTP_REPLY_TO`, else `SMTP_USER`) |
+| `inactive_warning` | `username`, `deleteOn`, `daysLeft`, `signInUrl` |
 
 ## A note on what crosses the wire
 
