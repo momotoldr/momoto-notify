@@ -138,6 +138,8 @@ export function parseNotification(body: unknown): NotificationRequest | string {
         Math.floor(stripCount / BUNDLE_STRIPS),
       )
       const bogo = data.bogo === true && stripCount - bundled * BUNDLE_STRIPS >= 2
+      // Optional too (a core that predates it sends none). Part of the total, so never all of it.
+      const adminFee = Math.min(count(data.adminFee) ?? 0, grossAmount - 1)
 
       return {
         type,
@@ -152,6 +154,7 @@ export function parseNotification(body: unknown): NotificationRequest | string {
           scrapbookTitles,
           bogo,
           bundled,
+          adminFee,
         },
       }
     }
