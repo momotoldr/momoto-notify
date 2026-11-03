@@ -73,6 +73,12 @@ export interface PaymentReceiptData {
    * priced alike — so the receipt pairs them up from the front.
    */
   bundled: number
+  /**
+   * The payment method's admin fee, in whole rupiah, already inside `grossAmount` — the
+   * one amount besides the total, since it was charged as its own line. 0 for none, and
+   * from a core that predates it.
+   */
+  adminFee: number
 }
 
 export interface RefundConfirmationData {

@@ -49,7 +49,14 @@ interface Copy {
   heading: string
   intro: string
   where: string
-  labels: { order: string; date: string; method: string; items: string; total: string }
+  labels: {
+    order: string
+    date: string
+    method: string
+    items: string
+    adminFee: string
+    total: string
+  }
   strips: (n: number) => string
   /** The two strips the partner buy 1 get 1 priced as one. */
   bogoStrips: string
@@ -67,7 +74,14 @@ const COPY: Record<Lang, Copy> = {
     heading: 'Payment received',
     intro: 'Thank you! Your payment went through and everything in this order is unlocked.',
     where: 'They are on your account now, ready to download whenever you like.',
-    labels: { order: 'Order', date: 'Paid', method: 'Method', items: 'Items', total: 'Total' },
+    labels: {
+      order: 'Order',
+      date: 'Paid',
+      method: 'Method',
+      items: 'Items',
+      adminFee: 'Admin fee',
+      total: 'Total',
+    },
     strips: (n) => (n === 1 ? '1 strip print' : `${n} strip prints`),
     bogoStrips: 'Buy 1 Get 1: 2 strip prints for the price of 1 strip',
     scrapbook: (title) => (title ? `Scrapbook: ${title}` : 'Scrapbook'),
@@ -83,7 +97,14 @@ const COPY: Record<Lang, Copy> = {
     heading: 'Pembayaran diterima',
     intro: 'Terima kasih! Pembayaranmu berhasil dan semua item dalam pesanan ini sudah terbuka.',
     where: 'Semuanya sudah ada di akunmu, siap diunduh kapan saja.',
-    labels: { order: 'Pesanan', date: 'Dibayar', method: 'Metode', items: 'Item', total: 'Total' },
+    labels: {
+      order: 'Pesanan',
+      date: 'Dibayar',
+      method: 'Metode',
+      items: 'Item',
+      adminFee: 'Biaya admin',
+      total: 'Total',
+    },
     strips: (n) => `${n} cetak strip`,
     bogoStrips: 'Beli 1 Gratis 1: 2 cetak strip seharga 1 strip',
     scrapbook: (title) => (title ? `Scrapbook: ${title}` : 'Scrapbook'),
@@ -114,6 +135,7 @@ export function paymentReceipt(data: PaymentReceiptData, lang: Lang): RenderedMa
     ...(data.method ? [[copy.labels.method, METHOD_LABEL[data.method]] as [string, string]] : []),
   ]
   const total = formatIdr(data.grossAmount)
+  const adminFee = data.adminFee > 0 ? formatIdr(data.adminFee) : null
 
   const text = textLayout(
     [copy.intro, copy.where],
@@ -121,6 +143,7 @@ export function paymentReceipt(data: PaymentReceiptData, lang: Lang): RenderedMa
       ...rows.map(([label, value]) => `  ${label}: ${value}`),
       `  ${copy.labels.items}:`,
       ...items.map((item) => `    - ${item}`),
+      ...(adminFee ? [`  ${copy.labels.adminFee}: ${adminFee}`] : []),
       `  ${copy.labels.total}: ${total}`,
     ].join('\n'),
     copy.footnote,
@@ -136,7 +159,7 @@ ${rows
   )
   .join('\n')}
 <tr><td style="${labelCell}">${copy.labels.items}</td><td style="${cell} color:#334155;">${items.map(escapeHtml).join('<br />')}</td></tr>
-<tr><td style="${labelCell} padding-top:10px; border-top:1px solid #e2e8f0;">${copy.labels.total}</td><td style="${cell} padding-top:10px; border-top:1px solid #e2e8f0; font-weight:700; color:#0f172a;">${total}</td></tr>
+${adminFee ? `<tr><td style="${labelCell}">${copy.labels.adminFee}</td><td style="${cell} color:#334155;">${adminFee}</td></tr>\n` : ''}<tr><td style="${labelCell} padding-top:10px; border-top:1px solid #e2e8f0;">${copy.labels.total}</td><td style="${cell} padding-top:10px; border-top:1px solid #e2e8f0; font-weight:700; color:#0f172a;">${total}</td></tr>
 </table>`
 
   return {
