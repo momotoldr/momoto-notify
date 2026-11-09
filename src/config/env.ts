@@ -121,7 +121,13 @@ function parseSmtp(): SmtpConfig | null {
 }
 
 const apiKey = process.env.NOTIFY_API_KEY?.trim() || null
+const smtp = parseSmtp()
 if (!apiKey) {
+  // With a real mailbox behind it, an open endpoint is a spam relay signing with our
+  // domain, so that is a refusal to start. Without one it only logs, which is local dev.
+  if (smtp) {
+    throw new Error('NOTIFY_API_KEY is required when SMTP is configured.')
+  }
   logger.warn('config.auth.open', {
     msg: 'NOTIFY_API_KEY is unset — every caller is accepted. Never deploy this way.',
   })
@@ -130,7 +136,7 @@ if (!apiKey) {
 export const env: Env = {
   port: positiveInt('PORT', process.env.PORT, 3002),
   apiKey,
-  smtp: parseSmtp(),
+  smtp,
   maxAttempts: positiveInt('NOTIFY_MAX_ATTEMPTS', process.env.NOTIFY_MAX_ATTEMPTS, 3),
   retryDelayMs: positiveInt('NOTIFY_RETRY_DELAY_MS', process.env.NOTIFY_RETRY_DELAY_MS, 30_000),
   sendIntervalMs: positiveInt(

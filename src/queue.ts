@@ -103,6 +103,16 @@ export function pendingByLane(): Record<Lane, number> {
 
 const sleep = (ms: number): Promise<void> => new Promise((r) => setTimeout(r, ms))
 
+/**
+ * An address as it may appear in a log: enough to find the person in the portal, without
+ * every log reader holding a list of customer addresses.
+ */
+export function maskAddress(address: string): string {
+  const at = address.lastIndexOf('@')
+  const local = address.slice(0, Math.max(at, 0))
+  return `${local.slice(0, Math.min(3, Math.ceil(local.length / 2)))}***${address.slice(at)}`
+}
+
 /** Removes and returns the next job that is due, urgent lane first. */
 function takeReady(now: number): Job | undefined {
   for (const jobs of Object.values(lanes)) {
@@ -158,12 +168,12 @@ async function drain(): Promise<void> {
       } catch (err) {
         const message = err instanceof Error ? err.message : String(err)
         if (job.attempts >= env.maxAttempts) {
-          // Given up on. Logged loudly with the type and recipient, because at this
-          // point a human is the only remaining retry mechanism.
+          // Given up on. Logged loudly with the type and a masked recipient, because at
+          // this point a human is the only remaining retry mechanism.
           logger.error('notify.failed', {
             id: job.id,
             type: job.request.type,
-            to: job.request.to,
+            to: maskAddress(job.request.to),
             attempts: job.attempts,
             err: message,
           })
@@ -204,8 +214,8 @@ async function drain(): Promise<void> {
  *
  * Called on SIGTERM. Anything waiting out a retry backoff is made due now — the backoff
  * assumed we'd still be here later. What is still queued at the deadline is logged one
- * line per message, recipient included, like `notify.failed`: a human is the only
- * retry left for it.
+ * line per message, masked recipient included, like `notify.failed`: a human is the
+ * only retry left for it.
  */
 export async function flush(deadline: number): Promise<number> {
   stopping = true
@@ -221,7 +231,7 @@ export async function flush(deadline: number): Promise<number> {
     logger.error('notify.interrupted', {
       id: inFlight.id,
       type: inFlight.request.type,
-      to: inFlight.request.to,
+      to: maskAddress(inFlight.request.to),
       attempts: inFlight.attempts,
     })
   }
@@ -230,7 +240,7 @@ export async function flush(deadline: number): Promise<number> {
       logger.error('notify.dropped', {
         id: job.id,
         type: job.request.type,
-        to: job.request.to,
+        to: maskAddress(job.request.to),
         attempts: job.attempts,
       })
     }
