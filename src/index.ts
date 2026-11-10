@@ -1,7 +1,8 @@
 import { env } from './config/env.js'
 import { createApp } from './http/app.js'
 import { logger } from './lib/logger.js'
-import { pending } from './queue.js'
+import { closeTransport } from './mail/transport.js'
+import { flush, pending, pendingByLane } from './queue.js'
 
 const server = createApp().listen(env.port, () => {
   logger.info('notify.listening', {
@@ -14,23 +15,36 @@ const server = createApp().listen(env.port, () => {
 })
 
 /**
- * How long to let in-flight requests finish before exiting anyway.
+ * Shutdown sends what's queued before exiting, instead of dropping it.
  *
- * `server.close()` waits for every open connection, and a keep-alive socket that
- * nobody is using will happily hold it open past the platform's grace period — at
- * which point the process is SIGKILLed and a clean stop is reported as a failed one.
+ * `server.close()` stops new connections at once, so a caller that arrives now is
+ * refused and retries against the new instance (momoto-core retries a refused
+ * connection once). Meanwhile the queue keeps draining, urgent lane first, for up to
+ * `NOTIFY_SHUTDOWN_GRACE_MS`.
+ *
+ * We exit when the queue is empty or the grace runs out, never on `server.close`'s
+ * callback: a keep-alive socket nobody is using would hold that open past the
+ * platform's kill deadline.
+ *
+ * **On Railway this only runs if node is PID 1** — start command `node dist/index.js`,
+ * not `npm start`, whose npm process swallows SIGTERM — and only with
+ * `RAILWAY_DEPLOYMENT_DRAINING_SECONDS` above the grace. See README.
  */
-const SHUTDOWN_GRACE_MS = 5_000
+let shuttingDown = false
 
 for (const signal of ['SIGTERM', 'SIGINT'] as const) {
   process.on(signal, () => {
-    logger.info('notify.shutdown', { signal, pending: pending() })
-    // Anything still queued is lost — see the note in `queue.ts` about why that is an
-    // acceptable trade for mail that is always re-requestable.
-    server.close(() => process.exit(0))
-    setTimeout(() => {
-      logger.warn('notify.shutdown.forced', { afterMs: SHUTDOWN_GRACE_MS })
+    // A second Ctrl-C means "now", for local development.
+    if (shuttingDown) process.exit(1)
+    shuttingDown = true
+
+    logger.info('notify.shutdown', { signal, pending: pending(), lanes: pendingByLane() })
+    server.close()
+    void flush(Date.now() + env.shutdownGraceMs).then((left) => {
+      closeTransport()
+      if (left === 0) logger.info('notify.shutdown.drained')
+      else logger.warn('notify.shutdown.dropped', { left, afterMs: env.shutdownGraceMs })
       process.exit(0)
-    }, SHUTDOWN_GRACE_MS).unref()
+    })
   })
 }

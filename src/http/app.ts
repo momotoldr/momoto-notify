@@ -4,7 +4,7 @@ import helmet from 'helmet'
 import { env } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 import { render } from '../mail/render.js'
-import { enqueue, pending } from '../queue.js'
+import { enqueue, pending, pendingByLane } from '../queue.js'
 
 import { parseNotification } from './validate.js'
 
@@ -37,7 +37,7 @@ export function createApp(): Express {
 
   app.set('trust proxy', Number(process.env.TRUST_PROXY ?? 1))
   app.use(helmet({ contentSecurityPolicy: false }))
-  // Invite bodies carry a rendered password and a display name; 64kb is ample.
+  // Payloads are a handful of short fields; 64kb is ample.
   app.use(express.json({ limit: '64kb' }))
 
   /**
@@ -53,7 +53,7 @@ export function createApp(): Express {
    * anything about who has been mailed.
    */
   const health = (_req: Request, res: Response): void => {
-    res.json({ status: 'ok', uptime: process.uptime(), pending: pending() })
+    res.json({ status: 'ok', uptime: process.uptime(), pending: pending(), lanes: pendingByLane() })
   }
   app.get('/', health)
   app.get('/healthz', health)
@@ -63,6 +63,10 @@ export function createApp(): Express {
   // Answers 202, never 200: nothing has been delivered when this returns. The caller
   // is a request handler whose own work already succeeded, so it must not be made to
   // wait on SMTP — and must not fail if the mailbox is down.
+  //
+  // 503 when the message's lane is full (see `queue.ts`): we are hours behind, and an
+  // honest refusal beats a 202 for mail that would land too late. Callers on a request
+  // path already ignore the outcome.
   app.post('/notifications', requireApiKey, (req, res) => {
     const parsed = parseNotification(req.body)
     if (typeof parsed === 'string') {
@@ -70,14 +74,19 @@ export function createApp(): Express {
       res.status(400).json({ error: 'invalid_request', detail: parsed })
       return
     }
-    res.status(202).json({ id: enqueue(parsed) })
+    const id = enqueue(parsed)
+    if (!id) {
+      res.setHeader('Retry-After', '60')
+      res.status(503).json({ error: 'queue_full' })
+      return
+    }
+    res.status(202).json({ id })
   })
 
   // ── POST /notifications/preview ─── render without sending ─────────────────
   //
-  // Exists for `send:invites --dry-run`, which has always let an operator eyeball the
-  // real thing before mailing 50 people. With the templates living here, that check
-  // has to happen here too.
+  // Lets an operator eyeball the real rendered message — subject, text and HTML —
+  // before anything is mailed. The templates live here, so the check has to as well.
   app.post('/notifications/preview', requireApiKey, (req, res) => {
     const parsed = parseNotification(req.body)
     if (typeof parsed === 'string') {

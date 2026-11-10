@@ -11,7 +11,16 @@
 
 /** Every kind of message this service can send. */
 export type NotificationType =
-  'verify_email' | 'password_reset' | 'password_changed' | 'beta_invite'
+  | 'verify_email'
+  | 'password_reset'
+  | 'password_changed'
+  | 'payment_receipt'
+  | 'refund_confirmation'
+  | 'support_reply'
+  | 'inactive_warning'
+
+/** Strips in one scrapbook bundle — momoto-core's `BUNDLE_STRIPS`. */
+export const BUNDLE_STRIPS = 3
 
 /** The locales Momoto ships. Anything else is treated as English. */
 export type Lang = 'en' | 'id'
@@ -33,25 +42,73 @@ export interface PasswordChangedData {
   resetUrl: string
 }
 
-export interface BetaInviteData {
-  displayName: string
-  username: string
-  /** The generated password. See the transport note in `README.md` about this. */
-  password: string
+/** The channels a payment can settle on. Mirrors `PAYMENT_METHODS` in momoto-core. */
+export type PaymentMethod = 'gopay' | 'shopeepay' | 'qris'
+
+export interface PaymentReceiptData {
+  /** Our Midtrans `order_id` — what support asks for when a payment is queried. */
+  orderId: string
+  /** What was actually charged, in whole rupiah. */
+  grossAmount: number
+  /** ISO timestamp of settlement. Rendered in Jakarta time. */
+  paidAt: string
+  /** Null when the channel isn't one we know; the line is then left out. */
+  method: PaymentMethod | null
   /**
-   * A second login, for the partner, in the same message.
-   *
-   * The beta seeds two accounts per registrant — theirs and one for whoever they
-   * shoot with — but only the registrant's address was ever collected, so there is
-   * nobody else to mail the second set to. Both go here and the registrant passes
-   * one on.
-   *
-   * Optional, and both fields move together: a recipient with no second account
-   * gets the original single-login mail, and the partner section is dropped from
-   * the template entirely rather than rendering blank.
+   * What the order bought. **No per-line prices, deliberately:** the price is read from
+   * config when the order is charged, so re-deriving a line price at settlement could
+   * disagree with the total if it changed in between. `grossAmount` is the one number
+   * that is certainly what was paid.
    */
-  partnerUsername?: string
-  partnerPassword?: string
+  stripCount: number
+  /** User-entered titles, possibly empty (untitled) — escaped before they reach the HTML. */
+  scrapbookTitles: string[]
+  /**
+   * Priced with the partner buy 1 get 1 (momoto-fe docs/PLAN-promos.md): two of the
+   * strips were charged as one. False from a core that predates the promos.
+   */
+  bogo: boolean
+  /**
+   * Scrapbook bundles in the order: each is one of the scrapbooks plus 3 of the strips,
+   * bought together for one price. Which book and which strips doesn't matter — they're
+   * priced alike — so the receipt pairs them up from the front.
+   */
+  bundled: number
+  /**
+   * The payment method's admin fee, in whole rupiah, already inside `grossAmount` — the
+   * one amount besides the total, since it was charged as its own line. 0 for none, and
+   * from a core that predates it.
+   */
+  adminFee: number
+}
+
+export interface RefundConfirmationData {
+  /** Our Midtrans `order_id` — what support asks for if the money doesn't show up. */
+  orderId: string
+  /** What went back, in whole rupiah. Always the full amount charged. */
+  amount: number
+  /** ISO timestamp of the refund. Rendered in Jakarta time. */
+  refundedAt: string
+  /** Where it went back to. Null when the channel isn't one we know; the line is then left out. */
+  method: PaymentMethod | null
+}
+
+export interface SupportReplyData {
+  /** The ticket as the admin console shows it ("SUP-0005") — the caller formats it. */
+  ticket: string
+  /** What the admin wrote, as plain text. Escaped, and its line breaks kept, in the HTML. */
+  message: string
+}
+
+export interface InactiveWarningData {
+  /** Which account, since one person may hold several. Escaped before it reaches the HTML. */
+  username: string
+  /** ISO timestamp the account is due to be deleted. Rendered as a Jakarta date. */
+  deleteOn: string
+  /** Whole days until then, for the copy: 14 for the first warning, 3 for the final one. */
+  daysLeft: number
+  /** The sign-in page. Signing in is what cancels the deletion, so no token is needed. */
+  signInUrl: string
 }
 
 /** A request to send one message to one person. */
@@ -59,11 +116,20 @@ export type NotificationRequest =
   | { type: 'verify_email'; to: string; lang?: Lang; data: VerifyEmailData }
   | { type: 'password_reset'; to: string; lang?: Lang; data: PasswordResetData }
   | { type: 'password_changed'; to: string; lang?: Lang; data: PasswordChangedData }
-  | { type: 'beta_invite'; to: string; lang?: Lang; data: BetaInviteData }
+  | { type: 'payment_receipt'; to: string; lang?: Lang; data: PaymentReceiptData }
+  | { type: 'refund_confirmation'; to: string; lang?: Lang; data: RefundConfirmationData }
+  | { type: 'support_reply'; to: string; lang?: Lang; data: SupportReplyData }
+  | { type: 'inactive_warning'; to: string; lang?: Lang; data: InactiveWarningData }
 
 /** A rendered message, ready for the transport. */
 export interface RenderedMail {
   subject: string
   text: string
   html: string
+  /**
+   * Blind-copy the support mailbox (`SMTP_REPLY_TO`, else `SMTP_USER`). For a support reply: SMTP doesn't
+   * file a Sent copy, so without it the mailbox the customer answers into would hold
+   * their reply but not what they're replying to.
+   */
+  copySupport?: boolean
 }

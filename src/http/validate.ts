@@ -1,4 +1,9 @@
-import type { NotificationRequest, NotificationType } from '../types.js'
+import {
+  BUNDLE_STRIPS,
+  type NotificationRequest,
+  type NotificationType,
+  type PaymentMethod,
+} from '../types.js'
 
 /**
  * Validates an untrusted body into a `NotificationRequest`.
@@ -11,8 +16,22 @@ const TYPES = new Set<NotificationType>([
   'verify_email',
   'password_reset',
   'password_changed',
-  'beta_invite',
+  'payment_receipt',
+  'refund_confirmation',
+  'support_reply',
+  'inactive_warning',
 ])
+
+const PAYMENT_METHODS = new Set<PaymentMethod>(['gopay', 'shopeepay', 'qris'])
+
+/** A cap on listed scrapbooks, matching nothing in particular — it only bounds the mail. */
+const MAX_RECEIPT_SCRAPBOOKS = 20
+
+/** An admin's reply — longer than any one support answer should need. */
+const MAX_SUPPORT_REPLY = 5000
+
+/** A username — momoto-core caps them well below this. */
+const MAX_USERNAME = 64
 
 /** Loose on purpose, mirroring the backend's own check. Delivery is the real test. */
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -35,6 +54,10 @@ function url(value: unknown): string | null {
   } catch {
     return null
   }
+}
+
+function count(value: unknown): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null
 }
 
 function positive(value: unknown, fallback: number): number {
@@ -84,35 +107,95 @@ export function parseNotification(body: unknown): NotificationRequest | string {
       if (!link) return 'password_changed needs a http(s) "data.resetUrl"'
       return { type, to, lang, data: { resetUrl: link } }
     }
-    case 'beta_invite': {
-      const displayName = str(data.displayName, 60)
-      const username = str(data.username, 20)
-      const password = str(data.password, 200)
-      if (!displayName || !username || !password) {
-        return 'beta_invite needs "data.displayName", "data.username" and "data.password"'
+    case 'payment_receipt': {
+      const orderId = str(data.orderId, 100)
+      const grossAmount = count(data.grossAmount)
+      const stripCount = count(data.stripCount)
+      const paidAt = str(data.paidAt, 40)
+      if (!orderId || !grossAmount || stripCount === null || !paidAt) {
+        return 'payment_receipt needs "data.orderId", "data.grossAmount", "data.stripCount" and "data.paidAt"'
       }
+      if (Number.isNaN(Date.parse(paidAt))) return 'payment_receipt "data.paidAt" is not a date'
 
-      // The second login is optional, but half of one is not: a username with no
-      // password would render a credentials box nobody can use, and the recipient
-      // has no way to tell that from a password they mistyped.
-      const partnerUsername = str(data.partnerUsername, 20)
-      const partnerPassword = str(data.partnerPassword, 200)
-      const wantsPartner = data.partnerUsername !== undefined || data.partnerPassword !== undefined
-      if (wantsPartner && (!partnerUsername || !partnerPassword)) {
-        return 'beta_invite needs both "data.partnerUsername" and "data.partnerPassword", or neither'
+      const rawTitles = Array.isArray(data.scrapbookTitles) ? data.scrapbookTitles : []
+      if (rawTitles.length > MAX_RECEIPT_SCRAPBOOKS) {
+        return `payment_receipt lists at most ${MAX_RECEIPT_SCRAPBOOKS} scrapbooks`
       }
+      // Empty is allowed — a scrapbook nobody titled — and renders as just "Scrapbook".
+      if (rawTitles.some((title) => typeof title !== 'string' || title.length > 120)) {
+        return 'payment_receipt "data.scrapbookTitles" must be strings of at most 120 characters'
+      }
+      const scrapbookTitles = (rawTitles as string[]).map((title) => title.trim())
+      // A receipt for nothing is a caller bug, not a message worth sending.
+      if (stripCount + scrapbookTitles.length === 0) return 'payment_receipt lists no items'
+
+      const method = PAYMENT_METHODS.has(data.method as PaymentMethod)
+        ? (data.method as PaymentMethod)
+        : null
+
+      // The promos (momoto-fe docs/PLAN-promos.md). Both optional, so a core that predates
+      // them still sends a valid receipt; and kept honest — a bundle needs a scrapbook and
+      // 3 strips of the order, and buy 1 get 1 needs two of the strips left after them.
+      const bundled = Math.min(
+        count(data.bundled) ?? 0,
+        scrapbookTitles.length,
+        Math.floor(stripCount / BUNDLE_STRIPS),
+      )
+      const bogo = data.bogo === true && stripCount - bundled * BUNDLE_STRIPS >= 2
+      // Optional too (a core that predates it sends none). Part of the total, so never all of it.
+      const adminFee = Math.min(count(data.adminFee) ?? 0, grossAmount - 1)
 
       return {
         type,
         to,
         lang,
         data: {
-          displayName,
-          username,
-          password,
-          ...(partnerUsername && partnerPassword ? { partnerUsername, partnerPassword } : {}),
+          orderId,
+          grossAmount,
+          paidAt,
+          method,
+          stripCount,
+          scrapbookTitles,
+          bogo,
+          bundled,
+          adminFee,
         },
       }
+    }
+    case 'refund_confirmation': {
+      const orderId = str(data.orderId, 100)
+      const amount = count(data.amount)
+      const refundedAt = str(data.refundedAt, 40)
+      if (!orderId || !amount || !refundedAt) {
+        return 'refund_confirmation needs "data.orderId", "data.amount" and "data.refundedAt"'
+      }
+      if (Number.isNaN(Date.parse(refundedAt))) {
+        return 'refund_confirmation "data.refundedAt" is not a date'
+      }
+      const method = PAYMENT_METHODS.has(data.method as PaymentMethod)
+        ? (data.method as PaymentMethod)
+        : null
+      return { type, to, lang, data: { orderId, amount, refundedAt, method } }
+    }
+    case 'support_reply': {
+      const ticket = str(data.ticket, 40)
+      const message = str(data.message, MAX_SUPPORT_REPLY)
+      if (!ticket || !message) {
+        return `support_reply needs "data.ticket" and a "data.message" of at most ${MAX_SUPPORT_REPLY} characters`
+      }
+      return { type, to, lang, data: { ticket, message } }
+    }
+    case 'inactive_warning': {
+      const username = str(data.username, MAX_USERNAME)
+      const deleteOn = str(data.deleteOn, 40)
+      const daysLeft = count(data.daysLeft)
+      const signInUrl = url(data.signInUrl)
+      if (!username || !deleteOn || !daysLeft || !signInUrl) {
+        return 'inactive_warning needs "data.username", "data.deleteOn", a positive "data.daysLeft" and a http(s) "data.signInUrl"'
+      }
+      if (Number.isNaN(Date.parse(deleteOn)))
+        return 'inactive_warning "data.deleteOn" is not a date'
+      return { type, to, lang, data: { username, deleteOn, daysLeft, signInUrl } }
     }
   }
 }

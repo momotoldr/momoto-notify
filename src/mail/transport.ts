@@ -1,6 +1,6 @@
 import nodemailer, { type Transporter } from 'nodemailer'
 
-import { env } from '../config/env.js'
+import { env, type SmtpConfig } from '../config/env.js'
 import { logger } from '../lib/logger.js'
 import type { RenderedMail } from '../types.js'
 
@@ -10,12 +10,20 @@ import type { RenderedMail } from '../types.js'
  * Built on first use rather than at import, so a bad password surfaces on the first
  * send instead of taking the whole service down at boot over a mailbox that may not
  * be needed for hours.
+ *
+ * **Pooled, one connection.** Unpooled, nodemailer dials, TLS-handshakes and
+ * authenticates for every single message — often longer than the send itself. The
+ * pool keeps that one connection open across sends and redials when the server drops
+ * it. One, because the queue is a single consumer anyway: more connections would sit
+ * idle, and a shared mailbox counts concurrent sessions against you.
  */
 let transport: Transporter | null = null
 
 function getTransport(): Transporter | null {
   if (!env.smtp) return null
   transport ??= nodemailer.createTransport({
+    pool: true,
+    maxConnections: 1,
     host: env.smtp.host,
     port: env.smtp.port,
     // 465 is implicit TLS; 587 upgrades via STARTTLS.
@@ -34,11 +42,26 @@ function getTransport(): Transporter | null {
   return transport
 }
 
+/** Closes the pooled connection, so a shutdown says QUIT instead of dropping the socket. */
+export function closeTransport(): void {
+  transport?.close()
+  transport = null
+}
+
 /**
  * Delivers one message. **Throws on failure** — unlike the fire-and-forget helper
  * this replaced in `momoto-core`, the caller here is the queue, whose entire job is to
  * notice a failure and try again.
  */
+/**
+ * Where a support reply's blind copy goes: the mailbox customers answer into
+ * (`SMTP_REPLY_TO`), else the one we sign in as — always a real mailbox, and with a
+ * `From` of that same address (staging, prod), it is where their answers land too.
+ */
+function supportMailbox(smtp: SmtpConfig): string {
+  return smtp.replyTo ?? smtp.user
+}
+
 export async function deliver(to: string, mail: RenderedMail): Promise<void> {
   const smtp = env.smtp
   const tx = getTransport()
@@ -62,6 +85,7 @@ export async function deliver(to: string, mail: RenderedMail): Promise<void> {
     text: mail.text,
     html: mail.html,
     ...(smtp.replyTo ? { replyTo: smtp.replyTo } : {}),
+    ...(mail.copySupport ? { bcc: supportMailbox(smtp) } : {}),
   })
   // Deliberately not logging the address on the success path: a delivered mail is
   // routine, and the log is not the place to accumulate a list of user emails.

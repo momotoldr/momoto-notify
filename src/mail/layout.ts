@@ -1,11 +1,6 @@
 /**
- * The shared chrome for the transactional emails, matching the beta invitation.
- *
- * The invitation is hand-written HTML in `templates/`; this is the same design
- * expressed as a function, so verification and reset mail arrive looking like they
- * came from the same product rather than from its error handler. Any visual change
- * has to be made in both places — that is the cost of keeping the invitation
- * hand-editable, and it is deliberate.
+ * The shared chrome for every email, so each one arrives looking like it came from
+ * the same product rather than from its error handler.
  *
  * **Built for email clients, not browsers.** Table layout, inline styles, no external
  * CSS or webfonts, 600px wide. The `<style>` block is progressive enhancement only:
@@ -23,7 +18,7 @@ const FONT = "'Helvetica Neue',Helvetica,Arial,sans-serif"
 export interface LayoutOptions {
   /** The grey preview line shown next to the subject. Hidden inside the message. */
   preheader: string
-  /** Small uppercase label in the brand bar — the invitation's says "Closed beta". */
+  /** Small uppercase label in the brand bar, e.g. "Account security". */
   eyebrow: string
   heading: string
   /** Body copy. Inline HTML (a `<strong>`) is fine; anything else should be escaped. */
@@ -32,6 +27,11 @@ export interface LayoutOptions {
   button?: { href: string; label: string }
   /** Tinted box under the body — where the "if this wasn't you" line belongs. */
   callout?: string
+  /**
+   * Space under the callout box, in px. Defaults to a one-line note's; the receipt's
+   * summary card gets more room before the footer (user, 2026-10-27).
+   */
+  calloutSpaceBelow?: number
   /** Fine print in the footer, above the Terms/Privacy links. */
   footnote: string
   lang: 'en' | 'id'
@@ -47,8 +47,19 @@ const FOOTER_LINKS: Record<'en' | 'id', { terms: string; privacy: string }> = {
   id: { terms: 'Ketentuan', privacy: 'Privasi' },
 }
 
+/** For user-entered text going into the HTML part — a scrapbook title, say. */
+export function escapeHtml(value: string): string {
+  return value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+}
+
 export function layout(options: LayoutOptions): string {
   const { preheader, eyebrow, heading, paragraphs, button, callout, footnote, lang } = options
+  const calloutSpaceBelow = options.calloutSpaceBelow ?? 8
   const links = FOOTER_LINKS[lang]
 
   const body = paragraphs
@@ -77,7 +88,7 @@ export function layout(options: LayoutOptions): string {
   const calloutRow = callout
     ? `
             <tr>
-              <td class="px" style="padding:20px 44px 8px 44px; font-family:${FONT};">
+              <td class="px" style="padding:20px 44px ${calloutSpaceBelow}px 44px; font-family:${FONT};">
                 <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background-color:#f8fafc; border:1px solid #e2e8f0; border-radius:14px;">
                   <tr>
                     <td style="padding:18px 22px; font-size:14px; line-height:22px; color:#475569;">${callout}</td>
